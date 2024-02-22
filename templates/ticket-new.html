@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>New Ticket</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
+    </head>
+    <body>
+
+        <div class="portal-wrap">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="notice notice-{{ category }}">
+                            {{ message | safe }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="portal ticket new-ticket">
+
+                {% with page_title="New Ticket", page="index" %}
+                    {% include "template-parts/header.html" %}
+                {% endwith %}
+
+                <form class="ticket-update" method="post" action="{{ url_for( 'handler_create_ticket' ) }}">
+
+                    <input type="text" placeholder="Subject" name="subject">
+
+
+                    <textarea placeholder="Ticket comments" name="comment"></textarea>
+
+                    <div class="ticket-update__actions">
+                        <button type="submit" name="action" class="button button-primary" value="update" onclick="return confirm('Are you sure you want create a new ticket?')">Create Ticket</button>
+                    </div>
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

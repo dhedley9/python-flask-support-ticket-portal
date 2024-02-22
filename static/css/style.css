@@ -1,0 +1,290 @@
+body{
+    background: #E5F3F4 !important;
+    border-top: 20px solid white;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    padding-top: 8%;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+    color: #3c434a;
+    font-size: 13px;
+    line-height: 1.4;  
+}
+
+body *{
+    box-sizing: border-box;
+}
+
+textarea{
+    max-width: 100%;
+    min-width: 100%;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+    border-color: #d2d3d5;
+    border-radius: 10px;
+    padding: 10px;
+    min-height: 100px;
+}
+
+textarea::placeholder {
+    opacity: 0.5;
+}
+
+.portal input,
+.portal select{
+    max-width: 100%;
+    min-width: 100%;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+    border-color: #d2d3d5;
+    border-style: solid;
+    border-radius: 10px;
+    padding: 10px;
+    border-width: 1px;
+    margin-bottom: 10px;
+}
+
+.portal input::placeholder {
+    opacity: 0.5;
+}
+
+/*--------------------------------------------------------------
+# Buttons
+--------------------------------------------------------------*/
+
+.button{
+    border: solid 1px #01BBC5;
+    padding: 9px 16px;
+    color: #01BBC5;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    background: none;
+}
+
+.button.button-primary{
+    background-color: #01BBC5;
+    color: white;
+}
+
+/*--------------------------------------------------------------
+# Notices
+--------------------------------------------------------------*/
+
+.notice{
+    width: 100%;
+    margin: auto;
+    padding: 26px 24px 34px;
+    border: 1px solid #c3c4c7;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    border-left: 4px solid #72aee6;
+    padding: 12px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+    word-wrap: break-word;
+}
+
+.notice.notice-error{
+    border-left-color: #d63638;
+}
+
+/*--------------------------------------------------------------
+# Login
+--------------------------------------------------------------*/
+
+.login-wrap{
+    width: 380px;
+    margin: auto;
+}
+
+#login-form{
+    padding: 26px 24px 34px;
+    font-weight: 400;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #d2d3d5;
+    box-shadow: 0 3px 8px rgba(0,0,0, 0.19);
+    border-radius: 15px;
+}
+
+#login-form .form-field input[type="text"],
+#login-form .form-field input[type="password"]{
+    font-size: 24px;
+    line-height: 1.33333333;
+    width: 100%;
+    border-width: 0.0625rem;
+    padding: 0.1rem 0.3125rem;
+    margin: 0 6px 16px 0;
+    min-height: 40px;
+    max-height: none;
+    box-shadow: 0 0 0 transparent;
+    border-radius: 4px;
+    border: 1px solid #8c8f94;
+    background-color: #fff;
+    color: #2c3338;
+}
+
+.login .register-message{
+    margin-bottom: 0;
+    margin-top: 15px;
+    font-size: 11px;
+    text-align: center;
+}
+
+
+/*--------------------------------------------------------------
+# Portal
+--------------------------------------------------------------*/
+
+.portal-wrap{
+    width: 80%;
+    margin: auto;
+}
+
+.portal{
+    padding: 30px;
+    font-weight: 400;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #d2d3d5;
+    box-shadow: 0 3px 8px rgba(0,0,0, 0.19);
+    border-radius: 15px;
+}
+
+/* Header */
+
+.portal .portal-header{
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.portal .portal-header .portal-header__title h1{
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+}
+
+.portal .portal-header .portal-header__menu{
+    margin-left: auto;
+}
+
+.portal .portal-header .portal-header__menu nav a{
+    color: #3c434a;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 5px 20px;
+}
+
+.portal .portal-header .portal-header__menu nav a:not(:last-child){
+    border-right: solid 1px #d2d3d5;
+}
+
+.portal .portal-header .portal-header__menu nav a.active{
+    position: relative;
+    font-weight: 600;
+    padding-bottom: 10px;
+}
+
+.portal .portal-header .portal-header__menu nav a.active:after{
+    content: '';
+    position: absolute;
+    border-bottom: #01BBC5 3px solid;
+    left: 20px;
+    right: 20px;
+    bottom: 4px;
+}
+
+
+/* Tickets Table (Overview) */
+
+.portal table.portal-tickets,
+.portal table.portal-tickets tr
+.portal table.portal-tickets th
+.portal table.portal-tickets td{
+    border-collapse: collapse;
+}
+
+.portal table.portal-tickets{
+    width: 100%;
+    margin-top: 40px;
+    font-size: 14px;
+}
+
+.portal table.portal-tickets thead th{
+    text-align: left;
+    font-weight: normal;
+}
+
+.portal table.portal-tickets thead th,
+.portal table.portal-tickets tbody td{
+    border-top: solid 1px #EDEDED;
+    border-bottom: solid 1px #EDEDED;
+    padding: 10px;
+}
+
+/* Ticket Singular */
+
+.portal .ticket-info{
+    display: flex;
+    margin: 20px 0;
+}
+
+.portal .ticket-info .ticket-info__item{
+    width: 25%;
+    padding-right: 20px;
+}
+
+.portal .ticket-info .ticket-info__item .ticket-info__item__label{
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.portal .ticket-info .ticket-info__item .ticket-info__item__value{
+    font-size: 15px;
+}
+
+.portal .ticket-comments .ticket-comment{
+    border-left: 5px solid grey;
+    padding: 10px 20px 20px 20px;
+    margin-bottom: 15px;
+}
+
+.portal .ticket-comments .ticket-comment.support{
+    border-left-color: #72aee6;
+}
+
+.portal .ticket-comments .ticket-comment .ticket-comment__top{
+    display: flex;
+    margin-bottom: 10px;
+    align-items: baseline;
+}
+
+.portal .ticket-comments .ticket-comment .ticket-comment__top .ticket-comment__author{
+    font-weight: bold;
+}
+
+.portal .ticket-comments .ticket-comment .ticket-comment__top .ticket-comment__date,
+.portal .ticket-comments .ticket-comment .ticket-comment__top .ticket-comment__time{
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+.portal .ticket-update h3{
+    margin-top: 20px;
+}
+
+.portal .ticket-update .ticket-update__actions{
+    margin-top: 20px;
+}
+
+.portal .ticket-update .ticket-update__actions .button:not(:first-child){
+    margin-left: 5px;
+}
+
+.portal .ticket-update .ticket-update__actions .delete{
+    margin-left: 10px;
+    color: #b32d2e;
+    border: none;
+    background: none;
+    text-decoration: underline;
+}

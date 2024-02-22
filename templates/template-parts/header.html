@@ -1,0 +1,16 @@
+<div class="portal-header">
+    <div class="portal-header__title">
+        <h1>{{ page_title }}</h1>
+    </div>
+    <div class="portal-header__menu">
+        <nav>
+            <a href="{{ url_for( 'index' ) }}" {% if page == 'index' %} class="active" {% endif %}>My Tickets</a>
+            <a href="{{ url_for( 'account' ) }}" {% if page == 'account' %} class="active" {% endif %}>My Account</a>
+            
+            {% if current_user.is_admin() %}
+                <a href="{{ url_for( 'users' ) }}" {% if page == 'users' %} class="active" {% endif %}>Users</a>
+            {% endif %}
+            <a href="{{ url_for( 'logout' ) }}" {% if page == 'logout' %} class="active" {% endif %}>Logout</a>
+        </nav>
+    </div>
+</div>
