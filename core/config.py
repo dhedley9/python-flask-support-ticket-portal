@@ -1,3 +1,5 @@
+# Config file containing basic configurations and global variables
+
 abspath    = None
 secret_key = 'f9ef569e702d1afc6c8347e1f54d6e35a286f0f5f984d4a5969dc24e484648da'
 
