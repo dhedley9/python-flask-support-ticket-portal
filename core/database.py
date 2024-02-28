@@ -7,7 +7,17 @@ import core.config as config
 
 class Database():
 
+    """
+    Class for handling all database interactions
+    """
+
     def __get_connection():
+
+        """
+        INTERNAL - Open a connection to the database
+
+        :return Connection object
+        """
 
         file = config.abspath
 
@@ -24,6 +34,10 @@ class Database():
             print(e)
 
     def create_default_tables() :
+
+        """
+        Create the database tables
+        """
 
         sql = """ CREATE TABLE IF NOT EXISTS users (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,6 +77,12 @@ class Database():
 
     def query( sql ):
 
+        """
+        Perform a database query
+
+        :param sql - (string) the SQL query
+        """
+
         connection = Database.__get_connection()
         cursor     = connection.cursor()
 
@@ -71,16 +91,29 @@ class Database():
     
     def insert( table, data ):
 
+        """
+        Standardised method to insert some data into a database table, in a prepared query
+
+        :param table - (string) the table name
+        :param data - (dictionary) the data to insert, where key is the column
+
+        :return int
+        """
+
+        # Get the column names
         columns = data.keys()
         columns = list( columns )
         columns = "', '".join( columns )
 
+        # Get the values to insert
         values  = data.values()
         values  = tuple( values )
 
+        # Generate a string of placeholders for the prepared query
         placeholders = ['?'] * len( values )
         placeholders = ", ".join( placeholders )
 
+        # Create the query with placeholders
         sql  = "INSERT INTO " + table
         sql += " ('" + columns + "')"
         sql += " VALUES (" + placeholders + ")"
@@ -93,6 +126,7 @@ class Database():
         connection = Database.__get_connection()
         cursor     = connection.cursor()
 
+        # Do the prepared query
         cursor.execute( sql, values )
 
         print(f'Last row id : {cursor.lastrowid}')
@@ -100,9 +134,20 @@ class Database():
         connection.commit()
         connection.close()
        
+        # Return the inserted ID
         return cursor.lastrowid
     
     def update( table, data, where ):
+
+        """
+        Standardised method to update some data in a database table, in a prepared query
+
+        :param table - (string) the table name
+        :param data - (dictionary) the new data to update the table with, where key is the column
+        :param where - (dictionary) the criteria to match records with, where key is the column
+
+        :return True
+        """
 
         columns    = []
         conditions = []
@@ -119,12 +164,14 @@ class Database():
         columns    = ", ".join( columns )
         conditions = " AND ".join( conditions )
 
+        # Assemble the query
         sql    = "UPDATE " + table + " SET " + columns + " WHERE " + conditions
         values = tuple( values )
 
         connection = Database.__get_connection()
         cursor     = connection.cursor()
 
+        # Do the prepared query
         cursor.execute( sql, values )
         connection.commit()
         connection.close()
@@ -132,6 +179,15 @@ class Database():
         return True
     
     def delete( table, where ):
+
+        """
+        Standardised method to delete some from a database table, in a prepared query
+
+        :param table - (string) the table name
+        :param where - (dictionary) the criteria to match records with, where key is the colum
+
+        :return True
+        """
 
         conditions = []
         values     = []
@@ -156,6 +212,15 @@ class Database():
 
     def get_row( sql, value = () ): 
 
+        """
+        Standardised method to retrieve a single row from the database
+
+        :param sql - (string) the sql query
+        :param value - (tuple) optional values for prepared queries
+
+        :return list
+        """
+
         connection = Database.__get_connection()
         cursor     = connection.cursor()
         result     = cursor.execute( sql, value ).fetchone()
@@ -164,6 +229,15 @@ class Database():
     
     def get_results( sql, value = () ): 
 
+        """
+        Standardised method to retrieve a multiple rows from the database
+
+        :param sql - (string) the sql query
+        :param value - (tuple) optional values for prepared queries
+
+        :return list
+        """
+
         connection = Database.__get_connection()
         cursor     = connection.cursor()
         results    = cursor.execute( sql, value ).fetchall()
@@ -171,6 +245,15 @@ class Database():
         return results
     
     def get_var( sql, value = () ):
+
+        """
+        Standardised method to retrieve a single value from the database
+
+        :param sql - (string) the sql query
+        :param value - (tuple) optional values for prepared queries
+
+        :return string
+        """
 
         result = Database.get_row( sql, value )
         return result[0]
