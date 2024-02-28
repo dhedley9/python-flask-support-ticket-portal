@@ -118,22 +118,15 @@ class Database():
         sql += " ('" + columns + "')"
         sql += " VALUES (" + placeholders + ")"
 
-        # insert = []
-
-        # for x in range(0, len( values ) ) :
-        #     insert.append( ( x, values[x] ) )
-
         connection = Database.__get_connection()
         cursor     = connection.cursor()
 
         # Do the prepared query
         cursor.execute( sql, values )
 
-        print(f'Last row id : {cursor.lastrowid}')
-
         connection.commit()
         connection.close()
-       
+
         # Return the inserted ID
         return cursor.lastrowid
     
