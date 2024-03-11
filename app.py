@@ -97,7 +97,11 @@ def login():
         
         flash( 'Invalid Email Address or Password', 'error' )
         
-        logger.info(f"User '{user.id}' FAILED login from IP address {client_ip}.")
+        if( user ) :
+            logger.info(f"User '{user.id}' FAILED login from IP address {client_ip}. Reason: Invalid password")
+        else:
+            logger.info(f"User '0' FAILED login from IP address {client_ip}. Reason: Invalid email. Email {email}")
+        
         
         return render_template( 'login.html', email = email )
 
