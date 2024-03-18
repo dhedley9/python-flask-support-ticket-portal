@@ -541,6 +541,8 @@ def handler_new_user():
         flash( 'An error occurred creating the user', 'error' )
         return redirect( url_for( 'new_user' ) )
     
+    flash( 'User account created', 'success' )
+    
     # Redirect to the edit page for the new user
     return redirect( url_for( 'user', id=user_id ) )
 
