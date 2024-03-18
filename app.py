@@ -349,6 +349,8 @@ def handler_update_ticket():
         else:
             Tickets.update_ticket( ticket['ID'], { 'status': 'processing' } )
 
+        flash( 'Ticket updated', 'success' )
+
         # Redirect to the ticket page
         return redirect( url_for( 'ticket', id=ticket['ID'] ) )
 
