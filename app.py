@@ -602,12 +602,12 @@ def handler_edit_user():
     # Check the email address is valid
     if( email != clean_email or not Users.validate_email( clean_email ) ):
         flash( 'Email address is invalid or contained invalid characters', 'error' )
-        return redirect( url_for( 'new_user' ) )
+        return redirect( url_for( 'user', id=user_id ) )
     
     # Check the role is valid
     if( role != 'standard' and role != 'administrator' ):
         flash( 'Invalid role', 'error' )
-        return redirect( url_for( 'new_user' ) )
+        return redirect( url_for( 'user', id=user_id ) )
     
     update = {}
 
