@@ -166,11 +166,14 @@ class Tickets():
             'title': result[1],
             'status': result[2],
             'created_by': result[3],
-            'date_created': result[4],
+            'date_created': datetime.strptime( result[4], '%Y-%m-%d %H:%M:%S' ),
             'last_updated': result[5],
             'number': '#{:06d}'.format( result[0] ),
             'status_label': Tickets.get_status_label( result[2] )
         }
+
+        if ticket['last_updated'] != None:
+            ticket['last_updated'] = datetime.strptime( ticket['last_updated'], '%Y-%m-%d %H:%M:%S' )
 
         return ticket
     
