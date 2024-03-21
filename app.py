@@ -345,9 +345,9 @@ def handler_update_ticket():
         # If an admin commented - mark as 'pending'
         elif( user.is_admin() ):
             Tickets.update_ticket( ticket['ID'], { 'status': 'pending' } )
-        # If a normal user commented - mark as 'processing'
+        # If a normal user commented - mark as 'active'
         else:
-            Tickets.update_ticket( ticket['ID'], { 'status': 'processing' } )
+            Tickets.update_ticket( ticket['ID'], { 'status': 'active' } )
 
         flash( 'Ticket updated', 'success' )
 
