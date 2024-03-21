@@ -94,3 +94,4 @@ app.py - the main application file
 /sql/ - directory containing the sqlite database
 /static/ - directory containing static assets (e.g. CSS)
 /templates/ - contains template HTML files for portal pages
+/testing/ - contains testing related scripts, (e.g. Unit Testing)
