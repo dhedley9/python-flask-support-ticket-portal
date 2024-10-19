@@ -22,13 +22,17 @@ class Database():
         file = config.abspath
 
         path = Path( file ).parent.absolute()
-        path = str( path )
-        path = path + '/sql/database.db'
+
+        sql_path = path / 'sql'
+        db_path  = path / 'sql/database.db'
+
+        if not sql_path.exists():
+            sql_path.mkdir()
 
         conn = None
 
         try:
-            conn = sqlite3.connect( path )
+            conn = sqlite3.connect( db_path )
             return conn
         except Error as e:
             print(e)
