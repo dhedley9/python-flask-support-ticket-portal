@@ -1,5 +1,45 @@
 # Support Ticket System - v1.0.0
 
+## Installation
+
+** Windows ** 
+
+1. Open Windows Powershell or Command Prompt
+2. Navigate to the directory of this program (where app.py is stored)
+3. Create a virtual environment using the command
+
+python -m venv env
+
+4. Activate the virtual environment
+
+env\Scripts\activate
+
+5. Install dependencies
+
+pip install flask bleach flask-login flask-wtf
+
+6. Start the application
+
+flask run
+
+** Mac / Linux **
+
+1. Open the terminal
+2. Navigate to the directory of this program (where app.py is stored)
+3. Create a virtual environment using the command
+
+python -m venv env
+
+source env/bin/activate
+
+5. Install dependencies
+
+pip install flask bleach flask-login flask-wtf
+
+6. Start the application
+
+flask run
+
 ## Summary
 This application is a basic support ticket system built with Flask. Each ticket consists of a user-entered title and associated comments.
 
@@ -42,7 +82,6 @@ The application uses several Flask extensions and libraries to provide a secure 
 - **Flask-Login**: Handles user authentication, allowing users to log in and log out, and manages user sessions.
 - **Flask-WTF**: Provides CSRF form protection to secure the application from cross-site request forgery attacks.
 
-## Dependencies - Installation
 To run this application, you will need to install the following dependencies:
 
 - Flask
