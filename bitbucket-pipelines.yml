@@ -1,14 +1,27 @@
-image: python:3.8
+# This is a sample build configuration for Python.
+# Check our guides at https://confluence.atlassian.com/x/x4UWN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: python:3.12.0
 
 pipelines:
-  branches:
-    master:
-      - step:
-          name: Deploy to Heroku
-          script:
-            - pip install -r requirements.txt
-            - curl https://cli-assets.heroku.com/install.sh | sh
-            - heroku auth:token
-            - echo "$HEROKU_API_KEY" | heroku auth:token
-            - git remote add heroku https://git.heroku.com/$HEROKU_APP_NAME.git
-            - git push heroku master
+  default:
+    - step:
+        name: Build
+        script:
+          - cd sample-python-app
+          - git archive --format=tar.gz main -o qa-software-engineering-devops.tar.gz
+        artifacts:
+          - qa-software-engineering-devops.tar.gz
+    - step:
+        name: Deploy to production
+        deployment: production
+        caches:
+          - pip
+        script:
+          - pipe: atlassian/heroku-deploy:0.1.1
+            variables:
+              HEROKU_API_KEY: $HEROKU_API_KEY
+              HEROKU_APP_NAME: $HEROKU_APP_NAME
+              ZIP_FILE: qa-software-engineering-devops.tar.gz
