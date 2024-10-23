@@ -1,0 +1,14 @@
+image: python:3.8
+
+pipelines:
+  branches:
+    master:
+      - step:
+          name: Deploy to Heroku
+          script:
+            - pip install -r requirements.txt
+            - curl https://cli-assets.heroku.com/install.sh | sh
+            - heroku auth:token
+            - echo "$HEROKU_API_KEY" | heroku auth:token
+            - git remote add heroku https://git.heroku.com/your-app-name.git
+            - git push heroku master
