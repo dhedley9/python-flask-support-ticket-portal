@@ -1,5 +1,5 @@
 body{
-    background: #050505 !important;
+    background: #ffffff !important;
     height: 100%;
     margin: 0;
     padding: 0;
@@ -95,24 +95,65 @@ textarea::placeholder {
     margin: auto;
 }
 
+.login-header{
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.login-header img{
+    width: 150px;
+}
+
 #login-form{
     padding: 26px 24px 34px;
     font-weight: 400;
-    overflow: hidden;
     background: #fff;
-    border: 1px solid #d2d3d5;
     box-shadow: 0 3px 8px rgba(0,0,0, 0.19);
     border-radius: 15px;
+    padding: 30px 10% 40px;
+    border: 1px solid #EAECED;
+    overflow: hidden;
+}
+
+#login-form h2{
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 22px;
+    margin-top: 10px;
+}
+
+#login-form .form-field{
+    position: relative;
+}
+
+#login-form .form-field label{
+    font-size: 12px;
+    margin-bottom: 4px;
+    display: inline-block;
+}
+
+#login-form .form-field .icon{
+    display: inline-block;
+    position: absolute;
+    top: 29px;
+    left: 10px;
+    z-index: 1;
+    font-size: 15px;
+    color: #7f7f7f;
+    border-right: solid 1px #cdcdcd;
+    padding-right: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }
 
 #login-form .form-field input[type="text"],
 #login-form .form-field input[type="password"]{
-    font-size: 24px;
+    font-size: 15px;
     line-height: 1.33333333;
     width: 100%;
     border-width: 0.0625rem;
-    padding: 0.1rem 0.3125rem;
-    margin: 0 6px 16px 0;
+    margin: 0 0 15px 0;
     min-height: 40px;
     max-height: none;
     box-shadow: 0 0 0 transparent;
@@ -120,6 +161,28 @@ textarea::placeholder {
     border: 1px solid #8c8f94;
     background-color: #fff;
     color: #2c3338;
+    padding: 10px 20px 8px 45px;
+    position: relative;
+}
+
+#login-form .form-field input[type="text"]:before{
+    position: absolute;
+    content: "\f007";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    left: 0;
+    top: 0;
+}
+
+#login-form #login_submit{
+    display: block;
+    width: 100%;
+    font-size: 19px;
+    cursor: pointer;
+    margin-top: 5px;
 }
 
 .login .register-message{
