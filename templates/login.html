@@ -8,22 +8,22 @@
     <body>
 
         <div class="login-wrap">
-
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="notice notice-{{ category }}">
-                            {{ message | safe }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
             
             <div class="login">
                 
                 <div class="login-header">
                     <img src="{{ url_for('static', filename='/images/ca-logo.png') }}" alt="Creative Asset Logo">
                 </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="notice notice-{{ category }}">
+                                {{ message | safe }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
                 <form id="login-form" action="" method="POST">
 
