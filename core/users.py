@@ -251,7 +251,17 @@ class Users():
 
             path     = Path( file ).parent.absolute()
             path     = str( path )
-            log_file = path + '/logs/user-logins.log'
+
+            # Get the current date in "YYYY-MM" format
+            current_date = datetime.now().strftime( "%Y-%m" )
+
+            # Log file for the current month
+            log_file = path + '/logs/user-logins-' + current_date + '.log'
+
+            # Check if the log file exists, if not, create it
+            if not os.path.exists( log_file ):
+                os.makedirs( os.path.dirname( log_file ), exist_ok=True )
+                open( log_file, 'a' ).close()
 
             # Create a custom logger
             custom_logger = logging.getLogger( 'user_logins_logger' )
