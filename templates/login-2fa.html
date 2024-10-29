@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', filename='/js/login-two-factor.js') }}"></script>
+    </head>
+    <body>
+
+        <div class="login-wrap two-factor-confirm">
+            
+            <div class="login">
+                
+                <div class="login-header">
+                    <img src="{{ url_for('static', filename='/images/ca-logo.png') }}" alt="Creative Asset Logo">
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="notice notice-{{ category }}">
+                                {{ message | safe }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form id="login-form" action="{{ confirm_url }}" method="POST">
+
+                    <h2>Help Us Verify Your Identity</h2>
+
+                    <div class="two-factor-code-wrap">
+                        <div class="two-factor-code-label">Enter the code from your authenticator app:</div>
+
+                        <div class="two-factor-code">
+                            <div class="two-factor-code-digits">
+                                <input type="text" name="two_factor_code_digit_1" value="" required maxlength="1">
+                                <input type="text" name="two_factor_code_digit_2" value="" required maxlength="1">
+                                <input type="text" name="two_factor_code_digit_3" value="" required maxlength="1">
+                            </div>
+
+                            <div class="two-factor-code-separator">-</div>
+
+                            <div class="two-factor-code-digits">
+                                <input type="text" name="two_factor_code_digit_4" value="" required maxlength="1">
+                                <input type="text" name="two_factor_code_digit_5" value="" required maxlength="1">
+                                <input type="text" name="two_factor_code_digit_6" value="" required maxlength="1">
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <input type="submit" name="submit" id="login_submit" class="button button-primary" value="Next">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

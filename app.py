@@ -52,12 +52,16 @@ def enforce_two_factor():
     if( not user or user.is_anonymous ):
         return
 
-    if endpoint is None or endpoint in ['login', 'login_setup_2fa', 'login_setup_2fa_confirm', 'static']:
+    if endpoint is None or endpoint in ['login', 'login_setup_2fa', 'login_setup_2fa_confirm', 'login_2fa', 'static']:
         return
         
-    if ( user.two_factor_auth == False ):
+    if ( user.two_factor_auth == False and user.two_factor_enabled == False ):
         
-        return redirect( url_for( 'login_setup_2fa_confirm' ) )
+        return redirect( url_for( 'login_setup_2fa' ) )
+    
+    elif( user.two_factor_auth == False and user.two_factor_enabled == True ):
+
+        return redirect( url_for( 'login_2fa' ) )
 
 # ROUTE - Index
 @app.route( '/' )
@@ -179,10 +183,52 @@ def login_setup_2fa_confirm():
 
         user.passed_two_factor_auth()
 
+        Users.update_user( user.id, { 'two_factor_enabled': 1 } )
+
         # Redirect to the homepage
         return redirect( url_for( 'index' ) )
 
     return render_template( 'login-setup-confirm-2fa.html' )
+
+# ROUTE - /login/2fa
+@app.route( '/login/2fa', methods=['GET', 'POST'] )
+def login_2fa():
+    
+    """
+    Returns and handles the 2FA form
+    """
+
+    user = flask_login.current_user
+
+    # Handle the submission of the 2FA setup confirmation form
+    if request.method == 'POST':
+
+        # Get the code digits
+        digit_1 = request.form.get( 'two_factor_code_digit_1' )
+        digit_2 = request.form.get( 'two_factor_code_digit_2' )
+        digit_3 = request.form.get( 'two_factor_code_digit_3' )
+        digit_4 = request.form.get( 'two_factor_code_digit_4' )
+        digit_5 = request.form.get( 'two_factor_code_digit_5' )
+        digit_6 = request.form.get( 'two_factor_code_digit_6' )
+
+        # Concatenate the digits to form the code
+        code = f"{digit_1}{digit_2}{digit_3}{digit_4}{digit_5}{digit_6}"
+
+        # Check the code is valid
+        if not Auth.verify_2fa_code( code, user.secret ):
+
+            flash( 'That code didn\'t work. Maybe it expired?', 'error' )
+
+            return render_template( 'login-setup-confirm-2fa.html' )
+
+        user.passed_two_factor_auth()
+
+        Users.update_user( user.id, { 'two_factor_enabled': 1 } )
+
+        # Redirect to the homepage
+        return redirect( url_for( 'index' ) )
+
+    return render_template( 'login-2fa.html' )
 
 # ROUTE - /register
 @app.route( '/register' )
