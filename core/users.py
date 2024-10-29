@@ -67,7 +67,7 @@ class Users():
         """
         
         # Only allow certain fields to be updated
-        allowed = ['email', 'password', 'role', 'last_login']
+        allowed = ['email', 'password', 'role', 'last_login', 'secret', 'two_factor_enabled']
         clean   = {}
         where   = { 'ID': ID }
 
@@ -118,7 +118,7 @@ class Users():
             field = 'ID'
 
         # Prepared query
-        sql = 'SELECT ID, email, password, salt, role, date_created, last_login FROM users WHERE ' + field + ' = ?'
+        sql = 'SELECT ID, email, password, salt, role, date_created, secret, two_factor_enabled, last_login FROM users WHERE ' + field + ' = ?'
 
         value  = [value]
         value  = tuple( value )
@@ -137,7 +137,9 @@ class Users():
             'salt': result[3],
             'role': result[4],
             'date_created': datetime.strptime( result[5], '%Y-%m-%d %H:%M:%S' ),
-            'last_login': result[6],
+            'secret': result[6],
+            'two_factor_enabled': result[7],
+            'last_login': result[8],
         }
 
         if userdata['last_login'] != None:
@@ -251,7 +253,17 @@ class Users():
 
             path     = Path( file ).parent.absolute()
             path     = str( path )
-            log_file = path + '/logs/user-logins.log'
+
+            # Get the current date in "YYYY-MM" format
+            current_date = datetime.now().strftime( "%Y-%m" )
+
+            # Log file for the current month
+            log_file = path + '/logs/user-logins-' + current_date + '.log'
+
+            # Check if the log file exists, if not, create it
+            if not os.path.exists( log_file ):
+                os.makedirs( os.path.dirname( log_file ), exist_ok=True )
+                open( log_file, 'a' ).close()
 
             # Create a custom logger
             custom_logger = logging.getLogger( 'user_logins_logger' )

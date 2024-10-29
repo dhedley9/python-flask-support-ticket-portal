@@ -7,7 +7,7 @@
     </head>
     <body>
 
-        <div class="login-wrap">
+        <div class="login-wrap two-factor-setup">
             
             <div class="login">
                 
@@ -25,34 +25,24 @@
                     {% endif %}
                 {% endwith %}
 
-                <form id="login-form" action="" method="POST">
+                <form id="login-form" action="{{ confirm_url }}" method="POST">
 
-                    <h2>Log in to your account</h2>
+                    <h2>Secure your account with Two Factor Authentication</h2>
 
-                    <div class="form-field">
-                        <label for="login_email">Email Address:</label>
+                    <div class="qr-code">
+                        <div>Scan the QR code below with your authenticator app:</div>
 
-                        <div class="icon">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        
-                        <input type="text" id="login_email" name="email" required="required" value="{{email}}" placeholder="Email address">
+                        {{qrcode_image | safe}}
                     </div>
 
-                    <div class="form-field">
-                        <label for="login_password">Password:</label>
-
-                        <div class="icon">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-
-                        <input type="password" id="login_password" name="password" spellcheck="false" required="required" placeholder="Password">
+                    <div class="secret">
+                        <div>Or enter the secret key below:</div>
+                        <input type="text" name="secret" id="secret" value="{{secret}}" readonly>
                     </div>
-
-                    <input type="submit" name="submit" id="login_submit" class="button button-primary" value="Log In">
+                  
+                    <input type="submit" name="submit" id="login_submit" class="button button-primary" value="Next">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 </form>
-                <p class="register-message">Don't have an account? <a href="{{ url_for( 'register' ) }}">Register now</a></p>
             </div>
         </div>
     </body>
