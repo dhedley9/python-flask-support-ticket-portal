@@ -50,6 +50,7 @@ class Database():
             salt TEXT NOT NULL,
             role TEXT NOT NULL,
             date_created DATETIME NOT NULL,
+            secret VARCHAR(32),
             last_login DATETIME
         ); """
 

@@ -4,11 +4,15 @@ click==8.1.7
 Flask==3.0.3
 Flask-Login==0.6.3
 Flask-WTF==1.2.1
+gunicorn==23.0.0
 itsdangerous==2.2.0
 Jinja2==3.1.4
 MarkupSafe==3.0.2
+packaging==24.1
+pillow==11.0.0
+pyotp==2.9.0
+qrcode==8.0
 six==1.16.0
 webencodings==0.5.1
 Werkzeug==3.0.4
 WTForms==3.2.0
-gunicorn>=23,<24

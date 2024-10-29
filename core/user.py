@@ -1,3 +1,5 @@
+from flask import session
+
 class User:
 
     """
@@ -22,10 +24,14 @@ class User:
     salt             = None
     role             = None
     date_created     = None
+    secret           = None
     last_login       = None
     is_authenticated = None
     is_active        = None
     is_anonymous     = None
+
+    two_factor_auth    = False
+    two_factor_enabled = False
 
     def __init__( self, args ) :
 
@@ -35,10 +41,14 @@ class User:
         self.salt             = args['salt']
         self.role             = args['role']
         self.date_created     = args['date_created']
+        self.secret           = args['secret']
         self.last_login       = args['last_login']
         self.is_authenticated = True
         self.is_active        = True
         self.is_anonymous     = False
+
+        if( session.get('two_factor_auth') ):
+            self.two_factor_auth = True
 
     def get_id( self ):
 
@@ -50,3 +60,10 @@ class User:
             return True
         
         return False
+    
+    def passed_two_factor_auth( self ):
+
+        session['two_factor_auth'] = True
+        self.two_factor_auth = True
+
+        return self.two_factor_auth
