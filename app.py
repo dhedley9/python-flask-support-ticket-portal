@@ -13,6 +13,7 @@ from core.user import User
 from core.tickets import Tickets
 from core.comments import Comments
 from core.auth import Auth
+from core.failed_logins import Failed_Logins
 
 # Create the database tables and the default admin user, if they don't exist
 Database.create_default_tables()
@@ -89,6 +90,11 @@ def login():
     Returns and handles the login form
     """
 
+    client_ip = request.remote_addr
+
+    if Failed_Logins.is_ip_locked( client_ip ):
+        return render_template( 'locked.html' ), 403
+
     # Handle the submission of the login form
     if request.method == 'POST':
 
@@ -97,7 +103,6 @@ def login():
         # Get the posted form info
         email     = request.form.get( 'email' )
         password  = request.form.get( 'password' )
-        client_ip = request.remote_addr
 
         # Sanitize
         email    = bleach.clean( email )
@@ -112,6 +117,8 @@ def login():
 
             # Record and log the login
             Users.track_login( user.id )
+            Failed_Logins.clear_failed_logins( client_ip )
+
             logger.info(f"User '{user.id}' logged in from IP address {client_ip}.")
 
             # Redirect to the homepage
@@ -124,7 +131,8 @@ def login():
         else:
             logger.info(f"User '0' FAILED login from IP address {client_ip}. Reason: Invalid email. Email {email}")
         
-        
+        Failed_Logins.log_failed_login( client_ip )
+
         return render_template( 'login.html', email = email )
 
     return render_template( 'login.html' )

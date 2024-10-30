@@ -254,6 +254,14 @@ textarea::placeholder {
     text-align: center;
 }
 
+/* Locked Out Page */
+
+.locked-out .lock-icon{
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 50px;
+}
+
 /*--------------------------------------------------------------
 # Portal
 --------------------------------------------------------------*/

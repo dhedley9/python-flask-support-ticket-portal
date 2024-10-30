@@ -81,6 +81,15 @@ class Database():
 
         Database.query( sql )
 
+        sql = """ CREATE TABLE IF NOT EXISTS failed_logins (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip_address TEXT NOT NULL,
+            attempts INTEGER DEFAULT 0,
+            last_attempt DATETIME
+        ); """
+
+        Database.query( sql )
+
     def query( sql ):
 
         """
