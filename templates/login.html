@@ -52,7 +52,7 @@
                     <input type="submit" name="submit" id="login_submit" class="button button-primary" value="Log In">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 </form>
-                <p class="register-message">Don't have an account? <a href="{{ url_for( 'register' ) }}">Register now</a></p>
+                <p class="register-message">Don't have an account? <a href="{{ url_for( 'auth.register' ) }}">Register now</a></p>
             </div>
         </div>
     </body>

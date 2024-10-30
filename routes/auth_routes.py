@@ -1,0 +1,246 @@
+from flask import Blueprint, request, redirect, url_for, render_template, flash, session
+
+import flask_login
+import bleach
+
+from core.users import Users
+from core.auth import Auth
+from core.failed_logins import Failed_Logins
+
+import core.config as config
+
+auth_bp = Blueprint( 'auth', __name__ )
+
+# ROUTE - /login
+@auth_bp.route( '/login', methods=['GET', 'POST'] )
+def login():
+
+    """
+    Returns and handles the login form
+    """
+
+    client_ip = request.remote_addr
+
+    if Failed_Logins.is_ip_locked( client_ip ):
+        return render_template( 'locked.html' ), 403
+
+    # Handle the submission of the login form
+    if request.method == 'POST':
+
+        logger    = Users.get_logger()
+
+        # Get the posted form info
+        email     = request.form.get( 'email' )
+        password  = request.form.get( 'password' )
+
+        # Sanitize
+        email    = bleach.clean( email )
+        password = bleach.clean( password )
+
+        # Try to retrieve the user by their email address
+        user     = Users.get_user_by( 'email', email )
+
+        # If there is a user and the (hashed) password match, log the user in
+        if user and user.password == Users.hash_password( password, user.salt, config.pepper ):
+            flask_login.login_user( user )
+
+            # Record and log the login
+            Users.track_login( user.id )
+            Failed_Logins.clear_failed_logins( client_ip )
+
+            logger.info(f"User '{user.id}' logged in from IP address {client_ip}.")
+
+            # Redirect to the homepage
+            return redirect( url_for( 'portal.index' ) )
+        
+        flash( 'Invalid Email Address or Password', 'error' )
+        
+        if( user ) :
+            logger.info(f"User '{user.id}' FAILED login from IP address {client_ip}. Reason: Invalid password")
+        else:
+            logger.info(f"User '0' FAILED login from IP address {client_ip}. Reason: Invalid email. Email {email}")
+        
+        Failed_Logins.log_failed_login( client_ip )
+
+        return render_template( 'login.html', email = email )
+
+    return render_template( 'login.html' )
+
+# ROUTE - /logout
+@auth_bp.route( '/logout' )
+def logout():
+
+    """
+    Simple route logs out the current user
+    """
+
+    session.pop( 'two_factor_auth', None )
+    flask_login.logout_user()
+    flash( 'You have been logged out', 'success' )
+
+    return redirect( 'auth.login' )
+
+# ROUTE - /register
+@auth_bp.route( '/register' )
+def register():
+
+    """
+    Simple route which outputs the user registration form
+    """
+
+    return render_template( 'register.html' )
+
+# ROUTE - /login/setup-2fa
+@auth_bp.route( '/login/setup-2fa', methods=['GET', 'POST'] )
+def login_setup_2fa():
+
+    """
+    Returns and handles the 2FA setup form
+    """
+
+    user = flask_login.current_user
+
+    secret = Auth.create_secret()
+    uri    = Auth.get_2fa_link( secret, user.email, 'TestSite' )
+    qr     = Auth.get_qr_code( uri )
+    image  = Auth.get_qr_code_img( qr )
+
+    Users.update_user( user.id, { 'secret': secret } )
+
+    confirm_url = url_for( 'auth.login_setup_2fa_confirm' )
+
+    return render_template( 'login-setup-2fa.html', qrcode_image = image, secret = secret, confirm_url = confirm_url )
+
+# ROUTE - /login/setup-2fa-confirm
+@auth_bp.route( '/login/setup-2fa-confirm', methods=['GET', 'POST'] )
+def login_setup_2fa_confirm():
+    
+    """
+    Handles the 2FA setup confirmation form
+    """
+
+    user = flask_login.current_user
+
+    # Handle the submission of the 2FA setup confirmation form
+    if request.method == 'POST':
+
+        # Get the code digits
+        digit_1 = request.form.get( 'two_factor_code_digit_1' )
+        digit_2 = request.form.get( 'two_factor_code_digit_2' )
+        digit_3 = request.form.get( 'two_factor_code_digit_3' )
+        digit_4 = request.form.get( 'two_factor_code_digit_4' )
+        digit_5 = request.form.get( 'two_factor_code_digit_5' )
+        digit_6 = request.form.get( 'two_factor_code_digit_6' )
+
+        # Concatenate the digits to form the code
+        code = f"{digit_1}{digit_2}{digit_3}{digit_4}{digit_5}{digit_6}"
+
+        # Check the code is valid
+        if not Auth.verify_2fa_code( code, user.secret ):
+
+            flash( 'That code didn\'t work. Maybe it expired?', 'error' )
+
+            return render_template( 'login-setup-confirm-2fa.html' )
+
+        user.passed_two_factor_auth()
+
+        Users.update_user( user.id, { 'two_factor_enabled': 1 } )
+
+        # Redirect to the homepage
+        return redirect( url_for( 'portal.index' ) )
+
+    return render_template( 'login-setup-confirm-2fa.html' )
+
+# ROUTE - /login/2fa
+@auth_bp.route( '/login/2fa', methods=['GET', 'POST'] )
+def login_2fa():
+    
+    """
+    Returns and handles the 2FA form
+    """
+
+    user = flask_login.current_user
+
+    # Handle the submission of the 2FA setup confirmation form
+    if request.method == 'POST':
+
+        # Get the code digits
+        digit_1 = request.form.get( 'two_factor_code_digit_1' )
+        digit_2 = request.form.get( 'two_factor_code_digit_2' )
+        digit_3 = request.form.get( 'two_factor_code_digit_3' )
+        digit_4 = request.form.get( 'two_factor_code_digit_4' )
+        digit_5 = request.form.get( 'two_factor_code_digit_5' )
+        digit_6 = request.form.get( 'two_factor_code_digit_6' )
+
+        # Concatenate the digits to form the code
+        code = f"{digit_1}{digit_2}{digit_3}{digit_4}{digit_5}{digit_6}"
+
+        # Check the code is valid
+        if not Auth.verify_2fa_code( code, user.secret ):
+
+            flash( 'That code didn\'t work. Maybe it expired?', 'error' )
+
+            return render_template( 'login-setup-confirm-2fa.html' )
+
+        user.passed_two_factor_auth()
+
+        Users.update_user( user.id, { 'two_factor_enabled': 1 } )
+
+        # Redirect to the homepage
+        return redirect( url_for( 'portal.index' ) )
+
+    return render_template( 'login-2fa.html' )
+
+# ROUTE - /post/create_account  
+@auth_bp.route( '/post/create_account', methods=['POST'] )
+def handler_create_account():
+
+    """
+    Form handler for the register for an account form
+    """
+    
+    # Get the form data
+    email    = request.form.get( 'email' )
+    password = request.form.get( 'password' )
+    confirm  = request.form.get( 'password_confirm' )
+
+    # Sanitise
+    clean_email    = bleach.clean( email )
+    clean_email    = Users.sanitize_email( email )
+    clean_password = bleach.clean( password )
+
+    # Check the email address is valid
+    if( email != clean_email or not Users.validate_email( clean_email ) ):
+        flash( 'Email address is invalid or contained invalid characters', 'error' )
+        return redirect( url_for( 'auth.register' ) )
+    
+    # Check the password isn't empty
+    if( not clean_password ) :
+        flash( 'Password cannot be empty', 'error' )
+        return redirect( url_for( 'auth.register' ) )
+    
+    # Check the two passwords match
+    if( clean_password != confirm ):
+        flash( 'Passwords must match', 'error' )
+        return redirect( url_for( 'auth.register' ) )
+    
+    user = Users.get_user_by( 'email', email )
+
+    # Check the email address hasn't already been used
+    if( user ):
+        flash( 'Email address has already been registered', 'error' )
+        return redirect( url_for( 'auth.register' ) )
+    
+    # Create a new user - with standard role
+    user_id = Users.create_user( email, password, 'standard' )
+
+    if( not user_id ):
+        flash( 'An error occurred creating the user', 'error' )
+        return redirect( url_for( 'auth.register' ) )
+    
+    # Log the user in to their new account
+    user = Users.get_user_by( 'ID', user_id )
+    flask_login.login_user( user )
+
+    # Redirect to the homepage
+    return redirect( url_for( 'portal.index' ) )
