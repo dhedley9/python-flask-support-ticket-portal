@@ -4,6 +4,7 @@ import os
 load_dotenv()
 
 secret_key = os.getenv( 'SECRET_KEY' )
+pepper     = os.getenv( 'PEPPER' )
 
 default_admin_email    = os.getenv( 'DEFAULT_USER' )
 default_admin_password = os.getenv( 'DEFAULT_PASSWORD' )

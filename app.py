@@ -112,7 +112,7 @@ def login():
         user     = Users.get_user_by( 'email', email )
 
         # If there is a user and the (hashed) password match, log the user in
-        if user and user.password == Users.hash_password( password, user.salt ):
+        if user and user.password == Users.hash_password( password, user.salt, config.pepper ):
             flask_login.login_user( user )
 
             # Record and log the login
@@ -514,7 +514,7 @@ def handler_update_account():
     update = {}
 
     # Check the user has confirmed their password to make changes
-    if( user.password != Users.hash_password( password, user.salt ) ):
+    if( user.password != Users.hash_password( password, user.salt, config.pepper ) ):
         flash( 'Please confirm your current password to make changes to your account', 'error' )
         return redirect( url_for( 'account' ) )
     
@@ -550,7 +550,7 @@ def handler_update_account():
             return redirect( url_for( 'account' ) )
         
         # Salt + Hash the password
-        hash = Users.hash_password( new_password, user.salt )
+        hash = Users.hash_password( new_password, user.salt, config.pepper )
 
         # If it's different, add it to the dictionary
         if hash != user.password:
@@ -752,7 +752,7 @@ def handler_edit_user():
     if( clean_password ):
 
         # Salt + Hash the password
-        hash = Users.hash_password( clean_password, user.salt )
+        hash = Users.hash_password( clean_password, user.salt, config.pepper )
 
         if( hash != user.password ):
             update['password'] = hash
