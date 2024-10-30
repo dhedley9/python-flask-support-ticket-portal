@@ -13,6 +13,7 @@ from core.user import User
 from core.tickets import Tickets
 from core.comments import Comments
 from core.auth import Auth
+from core.failed_logins import Failed_Logins
 
 # Create the database tables and the default admin user, if they don't exist
 Database.create_default_tables()
@@ -89,6 +90,11 @@ def login():
     Returns and handles the login form
     """
 
+    client_ip = request.remote_addr
+
+    if Failed_Logins.is_ip_locked( client_ip ):
+        return render_template( 'locked.html' ), 403
+
     # Handle the submission of the login form
     if request.method == 'POST':
 
@@ -97,7 +103,6 @@ def login():
         # Get the posted form info
         email     = request.form.get( 'email' )
         password  = request.form.get( 'password' )
-        client_ip = request.remote_addr
 
         # Sanitize
         email    = bleach.clean( email )
@@ -107,11 +112,13 @@ def login():
         user     = Users.get_user_by( 'email', email )
 
         # If there is a user and the (hashed) password match, log the user in
-        if user and user.password == Users.hash_password( password, user.salt ):
+        if user and user.password == Users.hash_password( password, user.salt, config.pepper ):
             flask_login.login_user( user )
 
             # Record and log the login
             Users.track_login( user.id )
+            Failed_Logins.clear_failed_logins( client_ip )
+
             logger.info(f"User '{user.id}' logged in from IP address {client_ip}.")
 
             # Redirect to the homepage
@@ -124,7 +131,8 @@ def login():
         else:
             logger.info(f"User '0' FAILED login from IP address {client_ip}. Reason: Invalid email. Email {email}")
         
-        
+        Failed_Logins.log_failed_login( client_ip )
+
         return render_template( 'login.html', email = email )
 
     return render_template( 'login.html' )
@@ -506,7 +514,7 @@ def handler_update_account():
     update = {}
 
     # Check the user has confirmed their password to make changes
-    if( user.password != Users.hash_password( password, user.salt ) ):
+    if( user.password != Users.hash_password( password, user.salt, config.pepper ) ):
         flash( 'Please confirm your current password to make changes to your account', 'error' )
         return redirect( url_for( 'account' ) )
     
@@ -542,7 +550,7 @@ def handler_update_account():
             return redirect( url_for( 'account' ) )
         
         # Salt + Hash the password
-        hash = Users.hash_password( new_password, user.salt )
+        hash = Users.hash_password( new_password, user.salt, config.pepper )
 
         # If it's different, add it to the dictionary
         if hash != user.password:
@@ -744,7 +752,7 @@ def handler_edit_user():
     if( clean_password ):
 
         # Salt + Hash the password
-        hash = Users.hash_password( clean_password, user.salt )
+        hash = Users.hash_password( clean_password, user.salt, config.pepper )
 
         if( hash != user.password ):
             update['password'] = hash
