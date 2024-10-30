@@ -1,9 +1,13 @@
-# Config file containing basic configurations and global variables
+from dotenv import load_dotenv
+import os
 
-abspath    = None
-secret_key = 'f9ef569e702d1afc6c8347e1f54d6e35a286f0f5f984d4a5969dc24e484648da'
+load_dotenv()
 
-default_admin_email    = 'admin@admin.co.uk'
-default_admin_password = 'password'
+secret_key = os.getenv( 'SECRET_KEY' )
 
+default_admin_email    = os.getenv( 'DEFAULT_USER' )
+default_admin_password = os.getenv( 'DEFAULT_PASSWORD' )
+
+# These variables are loaded later in the application
+abspath      = None
 users_logger = None
