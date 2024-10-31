@@ -250,9 +250,9 @@ body.page-auth-login-two-factor-setup #login-form .secret input{
     padding: 5px;
 }
 
-/* 2fa Confirm Page */
+/* Two Factor Setup Confirm Page */
 
-.two-factor-confirm h2{
+body.page-auth-login-two-factor-setup-confirm #login-form h2{
     margin-bottom: 20px;
 }
 
