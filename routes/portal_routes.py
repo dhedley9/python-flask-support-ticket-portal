@@ -26,7 +26,7 @@ def index():
         args['created_by'] = flask_login.current_user.id
     
     tickets = Tickets.get_tickets( args )
-    return render_template( 'index.html', tickets = tickets )
+    return render_template( 'portal/index.html', tickets = tickets )
 
 # ROUTE - /account
 @portal_bp.route( '/account' )
@@ -40,7 +40,7 @@ def account():
 
     user = flask_login.current_user
 
-    return render_template( 'account.html', email=user.email )
+    return render_template( 'portal/account.html', email=user.email )
 
 # ROUTE - /ticket/[ID]
 @portal_bp.route('/ticket/<int:id>')
@@ -74,7 +74,7 @@ def ticket( id ):
     comments = Comments.get_comments_by_ticket_id( ticket['ID'] )
     user     = Users.get_user_by( 'ID', ticket['created_by'] )
     
-    return render_template( 'ticket.html', ticket=ticket, comments=comments, user=user )
+    return render_template( 'portal/ticket.html', ticket=ticket, comments=comments, user=user )
 
 # ROUTE - /ticket/new
 @portal_bp.route('/ticket/new')
@@ -86,7 +86,7 @@ def new_ticket():
     - Login required
     """
 
-    return render_template( 'ticket-new.html' )
+    return render_template( 'portal/ticket-new.html' )
 
 # ROUTE - /users
 @portal_bp.route( '/users' )
@@ -104,7 +104,7 @@ def users():
         return redirect( url_for( 'portal.index' ) )
 
     users = Users.get_users()
-    return render_template( 'users.html', users = users )
+    return render_template( 'portal/users.html', users = users )
 
 # ROUTE - /user/new
 @portal_bp.route( '/user/new' )
@@ -121,7 +121,7 @@ def new_user():
         flash( 'You\'re not allowed to do that!', 'error' )
         return redirect( url_for( 'portal.index' ) )
     
-    return render_template( 'user-new.html' )
+    return render_template( 'portal/user-new.html' )
 
 # ROUTE - /user/[ID]
 @portal_bp.route('/user/<int:id>')
@@ -140,7 +140,7 @@ def user( id ):
 
     user = Users.get_user_by( 'ID', id )
 
-    return render_template( 'user.html', user = user )
+    return render_template( 'portal/user.html', user = user )
 
 # ROUTE - /post/create_ticket
 @portal_bp.route( '/post/create_ticket', methods=['POST'] )
