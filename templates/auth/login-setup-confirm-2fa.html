@@ -1,0 +1,39 @@
+{% extends "auth/auth_base.html" %}
+
+{% block title %}Confirm Two Factor Authentication{% endblock %}
+
+{% block body_class %}page-auth-login-two-factor-setup-confirm{% endblock %}
+
+{% block auth_form_action %}{{ confirm_url }}{% endblock %}
+
+{% block auth_form_content %}
+<h2>Secure your account with Two Factor Authentication</h2>
+
+<div class="two-factor-code-wrap">
+    <div class="two-factor-code-label">Enter the code from your authenticator app:</div>
+
+    <div class="two-factor-code">
+        <div class="two-factor-code-digits">
+            <input type="text" name="two_factor_code_digit_1" value="" required maxlength="1">
+            <input type="text" name="two_factor_code_digit_2" value="" required maxlength="1">
+            <input type="text" name="two_factor_code_digit_3" value="" required maxlength="1">
+        </div>
+
+        <div class="two-factor-code-separator">-</div>
+
+        <div class="two-factor-code-digits">
+            <input type="text" name="two_factor_code_digit_4" value="" required maxlength="1">
+            <input type="text" name="two_factor_code_digit_5" value="" required maxlength="1">
+            <input type="text" name="two_factor_code_digit_6" value="" required maxlength="1">
+        </div>
+    </div>
+</div>
+
+
+<input type="submit" name="submit" id="login_submit" class="button button-primary" value="Next">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='/js/login-two-factor.js') }}"></script>
+{% endblock %}

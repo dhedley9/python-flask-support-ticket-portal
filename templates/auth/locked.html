@@ -1,0 +1,17 @@
+{% extends "auth/auth_base.html" %}
+
+{% block title %}Access Locked{% endblock %}
+
+{% block body_class %}page-auth-access-locked{% endblock %}
+
+{% block auth_form_content %}
+<div class="lock-icon">
+    <i class="fa-solid fa-lock"></i>
+</div>
+
+<h2>Your access to this site has been limited</h2>
+
+<p>You have been prevented from accessing this site for a short amount of time. Please try again in a few minutes.</p>
+
+<p><b>Reason: </b>Blocked due to repeated failed login attempts.</p>
+{% endblock %}

@@ -24,7 +24,7 @@
                     {% include "template-parts/header.html" %}
                 {% endwith %}     
 
-                <form class="ticket-update" method="post" action="{{ url_for( 'handler_update_account' ) }}" onsubmit="return confirm('Are you sure you want to change your account details?')">
+                <form class="ticket-update" method="post" action="{{ url_for( 'portal.handler_update_account' ) }}" onsubmit="return confirm('Are you sure you want to change your account details?')">
 
                     <div class="form-field">
                         <label for="login_email">Email Address:</label>
