@@ -272,6 +272,29 @@ body.page-auth-access-locked #login-form .lock-icon{
     font-size: 50px;
 }
 
+/* Register Page */
+
+.password-strength{
+    margin-bottom: 20px;
+}
+
+.password-strength .password-strength-criteria .password-strength-criteria-icon .fa-xmark{
+    color: #c90000;
+}
+
+.password-strength .password-strength-criteria .password-strength-criteria-icon .fa-check{
+    color: #00c900;
+    display: none;
+}
+
+.password-strength .password-strength-criteria.passed .password-strength-criteria-icon .fa-xmark{
+    display: none;
+}
+
+.password-strength .password-strength-criteria.passed .password-strength-criteria-icon .fa-check{
+    display: inline;
+}
+
 /*--------------------------------------------------------------
 # Portal
 --------------------------------------------------------------*/
