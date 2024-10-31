@@ -4,8 +4,6 @@
 
 {% block body_class %}page-auth-login-two-factor-setup{% endblock %}
 
-{% block auth_form_action %}{{ confirm_url }}{% endblock %}
-
 {% block auth_form_content %}
 <h2>Secure your account with Two Factor Authentication</h2>
 
@@ -20,6 +18,5 @@
     <input type="text" name="secret" id="secret" value="{{secret}}" readonly>
 </div>
 
-<input type="submit" name="submit" id="login_submit" class="button button-primary" value="Next">
-<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+<a href="{{ confirm_url }}" id="login_submit" class="button button-primary">Next</a>
 {% endblock %}
