@@ -59,7 +59,7 @@ def enforce_two_factor():
     
     print( endpoint )
 
-    if endpoint is None or endpoint in ['auth.login', 'auth.login_setup_2fa', 'auth.login_setup_2fa_confirm', 'auth.login_2fa', 'static']:
+    if endpoint is None or endpoint in [ 'auth.logout', 'auth.login', 'auth.login_setup_2fa', 'auth.login_setup_2fa_confirm', 'auth.login_2fa', 'static']:
         return
         
     if ( user.two_factor_auth == False and user.two_factor_enabled == False ):
