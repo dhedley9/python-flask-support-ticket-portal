@@ -258,7 +258,7 @@ textarea::placeholder {
 
 /* Two Factor Page */
 
-body.login-two-factor #login-form h2{
+body.page-auth-login-two-factor #login-form h2{
     margin-bottom: 20px;
 }
 
