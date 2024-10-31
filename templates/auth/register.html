@@ -2,6 +2,8 @@
 
 {% block title %}Register{% endblock %}
 
+{% block body_class %}page-auth-register{% endblock %}
+
 {% block auth_form_action %}{{ url_for( 'auth.handler_create_account' ) }}{% endblock %}
 
 {% block auth_form_content %}
