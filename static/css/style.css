@@ -256,7 +256,7 @@ textarea::placeholder {
 
 /* Locked Out Page */
 
-.locked-out .lock-icon{
+body.page-auth-access-locked #login-form .lock-icon{
     text-align: center;
     margin-bottom: 30px;
     font-size: 50px;
