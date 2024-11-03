@@ -3,8 +3,9 @@ import os
 
 load_dotenv()
 
-secret_key = os.getenv( 'SECRET_KEY' )
-pepper     = os.getenv( 'PEPPER' )
+secret_key  = os.getenv( 'SECRET_KEY' )
+pepper      = os.getenv( 'PEPPER' )
+environment = os.getenv( 'FLASK_ENV' )
 
 default_admin_email    = os.getenv( 'DEFAULT_USER' )
 default_admin_password = os.getenv( 'DEFAULT_PASSWORD' )
