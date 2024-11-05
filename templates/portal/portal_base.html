@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "portal/template-parts/header.html" with context %}
+{% include "portal/template-parts/menu.html" %}
+
+<main>
+    <div class="portal-wrap">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="notice notice-{{ category }}">
+                        {{ message | safe }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="portal">
+
+            {% block portal_content %}{% endblock %}
+
+        </div>
+    </div>
+</main>
+
+<footer>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='/js/sidebar-menu.js') }}"></script>
+{% endblock %}

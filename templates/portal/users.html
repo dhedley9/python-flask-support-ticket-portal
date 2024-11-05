@@ -1,62 +1,39 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Users</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
-    </head>
-    <body>
+{% extends "portal/portal_base.html" %}
 
-        <div class="portal-wrap">
+{% block title %}Users{% endblock %}
+{% set header_title = "Users" %}
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="notice notice-{{ category }}">
-                            {{ message | safe }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+{% block portal_content %}
+<a href="{{ url_for( 'portal.new_user' ) }}" class="button">New User</a>
 
-            <div class="portal">
-
-                {% with page_title="All Users", page="users" %}
-                    {% include "template-parts/header.html" %}
-                {% endwith %}
-                
-                <a href="{{ url_for( 'portal.new_user' ) }}" class="button">New User</a>
-
-                <table class="portal-tickets">
-                    <thead>
-                        <tr>
-                            <th>User ID</th>
-                            <th>Email Address</th>
-                            <th>Role</th>
-                            <th>Registered</th>
-                            <th>Last Login</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                            <tr>
-                                <td>{{ user.ID }}</td>
-                                <td>{{ user.email }} {% if user.ID == current_user.id %}<b>(me)</b>{% endif %}</td>
-                                <td>{{ user.role }}</td>
-                                <td>{{ user.date_created }}</td>
-                                <td>{{ user.last_login }}</td>
-                                <td>
-                                    {% if user.ID == current_user.id %}
-                                        <a href="{{ url_for( 'portal.account' ) }}">Edit User</a>
-                                    {% elif user.role != 'superadministrator' %}
-                                        <a href="{{ url_for( 'portal.user', id=user.ID ) }}">Edit User</a>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </thead>
-                </table>
-            </div>
-        </div>
-    </body>
-</html>
+<table class="portal-tickets">
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Email Address</th>
+            <th>Role</th>
+            <th>Registered</th>
+            <th>Last Login</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.ID }}</td>
+                <td>{{ user.email }} {% if user.ID == current_user.id %}<b>(me)</b>{% endif %}</td>
+                <td>{{ user.role }}</td>
+                <td>{{ user.date_created }}</td>
+                <td>{{ user.last_login }}</td>
+                <td>
+                    {% if user.ID == current_user.id %}
+                        <a href="{{ url_for( 'portal.account' ) }}">Edit User</a>
+                    {% elif user.role != 'superadministrator' %}
+                        <a href="{{ url_for( 'portal.user', id=user.ID ) }}">Edit User</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </thead>
+</table>
+{% endblock %}
