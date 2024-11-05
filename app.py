@@ -14,6 +14,7 @@ from core.tickets import Tickets
 from core.comments import Comments
 from core.auth import Auth
 from core.failed_logins import Failed_Logins
+from core.mailer import Mailer
 
 # Import Blueprints
 from routes.auth_routes import auth_bp
@@ -25,7 +26,8 @@ count = Database.get_var( 'SELECT count( ID ) FROM users WHERE role = "administr
 count = int( count )
 
 if count == 0:
-    Users.create_user( config.default_admin_email, config.default_admin_password, 'administrator' )
+    admin_id = Users.create_user( config.default_admin_email, config.default_admin_password, 'administrator' )
+    Users.update_user( admin_id, { 'email_verified': 1 } )
 
 app            = Flask( __name__ )
 app.secret_key = config.secret_key
@@ -73,13 +75,20 @@ def enforce_two_factor():
     if( not user or user.is_anonymous ):
         return
     
-    if endpoint is None or endpoint in [ 'auth.logout', 'auth.login', 'auth.login_setup_2fa', 'auth.login_setup_2fa_confirm', 'auth.login_2fa', 'static']:
+    if endpoint is None or endpoint.startswith('auth.') or endpoint == 'static':
         return
-        
+    
+    # If the user has not verified their email, redirect to the email verification page
+    if( user.email_verified == False ):
+
+        return redirect( url_for( 'auth.verify_email' ) )
+    
+    # If the user has not enabled two factor authentication, redirect to the 2FA setup page
     if ( user.two_factor_auth == False and user.two_factor_enabled == False ):
         
         return redirect( url_for( 'auth.login_setup_2fa' ) )
     
+    # If the user has not passed two factor authentication, redirect to the 2FA page
     elif( user.two_factor_auth == False and user.two_factor_enabled == True ):
 
         return redirect( url_for( 'auth.login_2fa' ) )

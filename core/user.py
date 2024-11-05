@@ -18,34 +18,42 @@ class User:
         is_anonymous (bool): Whether the user is anonymous (not saved to DB)
     """
 
-    id               = None
-    email            = None 
-    password         = None
-    salt             = None
-    role             = None
-    date_created     = None
-    secret           = None
-    last_login       = None
-    is_authenticated = None
-    is_active        = None
-    is_anonymous     = None
+    id                      = None
+    email                   = None 
+    password                = None
+    salt                    = None
+    role                    = None
+    date_created            = None
+    secret                  = None
+    last_login              = None
+    email_verification_code = None
+    signup_email_sent       = None
+    is_authenticated        = None
+    is_active               = None
+    is_anonymous            = None
 
+    email_verified     = False
     two_factor_auth    = False
     two_factor_enabled = False
 
     def __init__( self, args ) :
+        
+        self.id                      = args['ID']
+        self.email                   = args['email']
+        self.password                = args['password']
+        self.salt                    = args['salt']
+        self.role                    = args['role']
+        self.date_created            = args['date_created']
+        self.secret                  = args['secret']
+        self.last_login              = args['last_login']
+        self.email_verification_code = args['email_verification_code']
+        self.signup_email_sent       = args['signup_email_sent']
+        self.is_authenticated        = True
+        self.is_active               = True
+        self.is_anonymous            = False
 
-        self.id                 = args['ID']
-        self.email              = args['email']
-        self.password           = args['password']
-        self.salt               = args['salt']
-        self.role               = args['role']
-        self.date_created       = args['date_created']
-        self.secret             = args['secret']
-        self.last_login         = args['last_login']
-        self.is_authenticated   = True
-        self.is_active          = True
-        self.is_anonymous       = False
+        if( int( args['email_verified'] ) == 1 ):
+            self.email_verified = True
 
         if( session.get('two_factor_auth') ):
             self.two_factor_auth = True
