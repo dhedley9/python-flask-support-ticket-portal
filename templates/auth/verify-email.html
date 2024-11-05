@@ -1,0 +1,15 @@
+{% extends "auth/auth_base.html" %}
+
+{% block title %}Verify Email{% endblock %}
+
+{% block body_class %}page-auth-verify-email{% endblock %}
+
+{% block auth_form_content %}
+<h2>Verify your email address</h2>
+
+<p>Before you can log in, you need to verify your email address. We've sent you an email with a link that you can use to verify your email address.</p>
+
+<p>If you haven't received the email, please check your spam folder, or <a href="{{ url_for( 'auth.verify_email', resend=1 ) }}">click here to resend the email</a></p>
+
+<a href="{{ url_for( 'portal.index' ) }}" id="login_submit" class="button button-primary">I've verified my email</a>
+{% endblock %}

@@ -51,6 +51,9 @@ class Database():
             role TEXT NOT NULL,
             date_created DATETIME NOT NULL,
             secret VARCHAR(32),
+            email_verified INTEGER DEFAULT 0,
+            email_verification_code VARCHAR(32),
+            signup_email_sent DATETIME,
             two_factor_enabled INTEGER DEFAULT 0,
             last_login DATETIME
         ); """
