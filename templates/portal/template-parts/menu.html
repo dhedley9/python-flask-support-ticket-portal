@@ -9,6 +9,11 @@
             <span class="sidebar-menu-link_icon"><i class="fa-solid fa-users"></i></span>
             <span class="sidebar-menu-link_name">Users</span>
         </a>
+
+        <a href="{{ url_for( 'portal.failed_logins' ) }}" class="sidebar-menu-link failed-logins">
+            <span class="sidebar-menu-link_icon"><i class="fa-solid fa-circle-exclamation"></i></span>
+            <span class="sidebar-menu-link_name">Failed Logins</span>
+        </a>
     {% endif %}
 
     <a href="{{ url_for( 'auth.logout' ) }}" class="sidebar-menu-link logout" onclick="return confirm( 'Are you sure you want to logout?' );">

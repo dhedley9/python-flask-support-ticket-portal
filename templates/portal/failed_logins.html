@@ -1,0 +1,39 @@
+{% extends "portal/portal_base.html" %}
+
+{% block title %}Failed Login Attempts{% endblock %}
+{% set header_title = "Failed Login Attempts" %}
+
+{% block portal_content %}
+
+{% if failed_logins %}
+    <table class="portal-tickets">
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Attempts</th>
+                <th>Last Attempt</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for login in failed_logins %}
+                <tr>
+                    <td>{{ login.ip_address }}</td>
+                    <td>{{ login.attempts }}</td>
+                    <td>{{ login.last_attempt }}</td>
+                    <td>{{ login.status }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <table class="portal-tickets">
+        <thead>
+            <tr>
+                <th>No failed login attempts</th>
+            </tr>
+        </thead>
+    </table>
+{% endif %}
+
+{% endblock %}

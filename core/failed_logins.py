@@ -1,3 +1,5 @@
+import math
+
 from core.database import Database
 from datetime import datetime
 
@@ -71,3 +73,39 @@ class Failed_Logins():
         }
 
         Database.delete( 'failed_logins', where )
+
+    def get_failed_logins():
+
+        sql     = 'SELECT ID, ip_address, attempts, last_attempt FROM failed_logins;'
+        results = Database.get_results( sql )
+        logins  = []
+        now     = datetime.today()
+
+        for result in results:
+            
+            login = {
+                'ID': result[0],
+                'ip_address': result[1],
+                'attempts': result[2],
+                'last_attempt': result[3]
+            }
+
+            date       = datetime.strptime( result[3], '%Y-%m-%d %H:%M:%S' )
+            difference = now - date
+
+            if difference.total_seconds() > 300:
+                status      = 'Unlocked'
+            else:
+                unlock_time = 300 - difference.total_seconds()
+                unlock_time = math.ceil( unlock_time / 60 )
+
+                if( unlock_time == 1 ):
+                    status = 'Locked for ' + str( unlock_time ) + ' minute'
+                else:
+                    status = 'Locked for ' + str( unlock_time ) + ' minutes'
+
+            login['status']      = status
+
+            logins.append( login )
+        
+        return logins
