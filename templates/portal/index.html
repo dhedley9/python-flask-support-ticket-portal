@@ -3,9 +3,11 @@
 {% block title %}My Tickets{% endblock %}
 {% set header_title = "My Tickets" %}
 
-{% block portal_content %}
+{% set header_actions %}
+    <a href="{{ url_for( 'portal.new_ticket' ) }}" class="button">Add Ticket</a>
+{% endset %}
 
-<a href="{{ url_for( 'portal.new_ticket' ) }}" class="button">Add Ticket</a>
+{% block portal_content %}
 
 <table class="portal-tickets">
     <thead>
