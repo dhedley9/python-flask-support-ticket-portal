@@ -15,6 +15,16 @@ pipelines:
           artifacts:
             - qa-software-engineering-devops.tar.gz
       - step:
+          name: Test
+          caches:
+            - pip
+          script:
+            - python -m venv venv
+            - source venv/bin/activate
+            - pip install -r requirements.txt
+            - pip install pytest pytest-flask
+            - pytest --maxfail=1 --disable-warnings
+      - step:
           name: Deploy to production
           deployment: production
           caches:

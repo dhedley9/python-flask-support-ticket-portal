@@ -1,10 +1,10 @@
 # QA Software Engineering & DevOps Assignment - David Hedley
 
 ## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Installation](#installation)
-- [Additional Resources](#additional-resources)
+- [Overview](#markdown-header-overview)
+- [Features](#markdown-header-features)
+- [Installation](#markdown-header-installation)
+- [Additional Resources](#markdown-header-additional-resources)
 
 ## Overview
 
@@ -16,7 +16,7 @@ This project was developed as part of my QA Apprenticeship for the Software Engi
 
 ## Features
 
-- **Secure Login**: Users can log in with cryptographically secure password storage, using a combination of salting, peppering, and hashing to protect passwords.
+- **Secure Login**: Users can log in with cryptographically secure password storage, using a combination of salting, peppering and hashing to protect passwords.
 - **Two-Factor Authentication (2FA)**: App-based 2FA provides an extra layer of security for user logins.
 - **Account Registration with Email Verification**: New users can register and verify their account via email using the Mailgun API.
 - **Cross-Site Request Forgery (CSRF) Protection**: CSRF tokens are implemented to prevent unauthorized commands from external sources.
@@ -36,8 +36,8 @@ This project was developed as part of my QA Apprenticeship for the Software Engi
 
 2. **Navigate to the project directory**:
     ```bash
-   cd assignment-software-engineering-devops
-   ```
+    cd assignment-software-engineering-devops
+    ```
 
 3. **Create a virtual environment** (recommended):
     ```bash
@@ -81,7 +81,7 @@ This project was developed as part of my QA Apprenticeship for the Software Engi
 
 8. **Replace Mailgun credentials**:
 
-    The application uses Mailgun to provide email sending functionality. The app uses the Mailgun API to add this functionality and requires the following environment variables to be configured. For more information on how to setup Mailgun, see the [Additional Resources](#additional-resources)
+    The application uses Mailgun to provide email sending functionality. The app uses the Mailgun API to add this functionality and requires the following environment variables to be configured. For more information on how to setup Mailgun, see the [Additional Resources](#markdown-header-additional-resources)
 
     - MAILGUN_API_KEY - the Mailgun API key created for the application
     - MAILGUN_DOMAIN - the sending domain used for Mailgun (Mailgun recommends this to be a subdomain, e.g. mailgun.example.com)
