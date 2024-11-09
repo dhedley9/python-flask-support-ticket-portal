@@ -1,4 +1,5 @@
-from core.database import Database
+from core.database import database
+from models.comment import Comment
 from datetime import datetime
 
 class Comments():
@@ -19,7 +20,7 @@ class Comments():
         :return comment_id
         """
 
-        date = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+        date = datetime.today()
 
         data = {
             'ticket_id': ticket_id,
@@ -28,9 +29,11 @@ class Comments():
             'date_created': date,
         }
         
-        comment_id = Database.insert( 'comments', data )
+        comment = Comment( data )
 
-        return comment_id
+        database.add_model( comment )
+
+        return comment.ID
     
     def get_comments_by_ticket_id( ticket_id ):
 
@@ -42,25 +45,6 @@ class Comments():
         :return list - containing dictionaries
         """
 
-        sql = 'SELECT ID, ticket_id, user_id, content, date_created FROM comments WHERE ticket_id = ? ORDER BY date_created ASC'
-
-        value = [ticket_id]
-        value = tuple( value )
-
-        results  = Database.get_results( sql, value )
-        comments = []
-
-        # Organise the results into dictionaries
-        for row in results:
-
-            comment = {
-                'ID': row[0],
-                'ticket_id': row[1],
-                'user_id': row[2],
-                'content': row[3],
-                'date_created': datetime.strptime( row[4], '%Y-%m-%d %H:%M:%S' ),
-            }
-
-            comments.append( comment )
+        comments = database.get_models( Comment, { 'ticket_id': ticket_id } )
 
         return comments

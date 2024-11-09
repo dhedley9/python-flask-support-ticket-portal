@@ -5,8 +5,9 @@ import logging
 
 import core.config as config
 
-from core.database import Database
-from core.user import User
+from core.database import database
+from models.user import User
+from sqlalchemy import func
 
 from datetime import datetime
 from pathlib import Path
@@ -32,11 +33,11 @@ class Users():
         user = Users.get_user_by( 'email', email )
 
         # Check there isn't already a user with that email address
-        if( user != False ) :
+        if( user != None ) :
             return False
         
         # Get today's date and a random salt string
-        date   = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+        date   = datetime.today()
         salt   = os.urandom( 32 )
         pepper = config.pepper
 
@@ -51,10 +52,11 @@ class Users():
             'date_created': date,
         }
 
-        # Insert the user to the database
-        user_id = Database.insert( 'users', data )
+        user = User( data )
 
-        return user_id
+        database.add_model( user )
+
+        return user.ID
     
     def update_user( ID, args ):
 
@@ -66,21 +68,21 @@ class Users():
 
         :return boolean
         """
+
+        user = Users.get_user_by( 'ID', ID )
         
         # Only allow certain fields to be updated
         allowed = ['email', 'password', 'role', 'last_login', 'secret', 'email_verified', 'email_verification_code', 'signup_email_sent', 'two_factor_enabled']
-        clean   = {}
-        where   = { 'ID': ID }
+        updated = False
 
         for key in args:
             
             if key in allowed:
-                clean[key] = args[key]
+                setattr( user, key, args[key] )
+                updated = True
 
-        if len( clean ) == 0:
-            return False
-        
-        Database.update( 'users', clean, where )
+        if updated:
+            database.commit()
 
         return True
     
@@ -94,9 +96,12 @@ class Users():
         :return True
         """
 
-        where = { 'ID': ID }
+        user = Users.get_user_by( 'ID', ID )
 
-        Database.delete( 'users', where )
+        if user == False:
+            return False
+        
+        database.delete_model( user )
 
         return True
     
@@ -118,39 +123,7 @@ class Users():
         if field not in fields: 
             field = 'ID'
 
-        # Prepared query
-        sql = 'SELECT ID, email, password, salt, role, date_created, secret, email_verified, email_verification_code, signup_email_sent, two_factor_enabled, last_login FROM users WHERE ' + field + ' = ?'
-
-        value  = [value]
-        value  = tuple( value )
-        
-        result = Database.get_row( sql, value )
-
-        # Check there is a user
-        if( result == None ) :
-            return False
-        
-        # Convert to standardised dictionary
-        userdata = {
-            'ID': result[0],
-            'email': result[1],
-            'password': result[2],
-            'salt': result[3],
-            'role': result[4],
-            'date_created': datetime.strptime( result[5], '%Y-%m-%d %H:%M:%S' ),
-            'secret': result[6],
-            'email_verified': result[7],
-            'email_verification_code': result[8],
-            'signup_email_sent': result[9],
-            'two_factor_enabled': result[10],
-            'last_login': result[11],
-        }
-
-        if userdata['last_login'] != None:
-            userdata['last_login'] = datetime.strptime( userdata['last_login'], '%Y-%m-%d %H:%M:%S' )
-
-        # Create a user object
-        return User( userdata )
+        return database.get_model( User, { field: value } )
     
     def get_users():
 
@@ -160,29 +133,7 @@ class Users():
         :return List - containing dictionaries
         """
 
-        sql = 'SELECT ID, email, password, salt, role, date_created, last_login FROM users'
-
-        results = Database.get_results( sql )
-        users   = []
-
-        # Organise results into dictionaries
-        for row in results:
-
-            userdata = {
-                'ID': row[0],
-                'email': row[1],
-                'password': row[2],
-                'salt': row[3],
-                'role': row[4],
-                'date_created': datetime.strptime( row[5], '%Y-%m-%d %H:%M:%S' ),
-                'last_login': row[6],
-            }
-
-            # If there is a value for the last login, convert into a datetime
-            if userdata['last_login'] != None:
-                userdata['last_login'] = datetime.strptime( userdata['last_login'], '%Y-%m-%d %H:%M:%S' )
-
-            users.append( userdata )
+        users = database.get_models( User )
 
         return users
     
@@ -242,7 +193,7 @@ class Users():
         :param ID - (int) the user ID
         """
         
-        last_login = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+        last_login = datetime.today()
 
         Users.update_user( ID, { 'last_login': last_login } )
 
@@ -289,3 +240,9 @@ class Users():
             config.users_logger = custom_logger
         
         return config.users_logger
+    
+    def admin_user_exists():
+
+        admin_count = database.session.query( func.count( User.ID )).filter( User.role == "administrator" ).scalar()
+
+        return admin_count > 0

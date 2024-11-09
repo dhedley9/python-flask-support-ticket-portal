@@ -24,7 +24,7 @@ def index():
     args = {}
 
     if( not flask_login.current_user.is_admin() ):
-        args['created_by'] = flask_login.current_user.id
+        args['created_by'] = flask_login.current_user.ID
     
     tickets = Tickets.get_tickets( args )
     return render_template( 'portal/index.html', tickets = tickets )
@@ -65,15 +65,15 @@ def ticket( id ):
         return redirect( url_for( 'portal.index' ) )
     
     # Check the current user can access the ticket
-    if current_user.role != 'administrator' and ticket['created_by'] != current_user.id:
+    if current_user.role != 'administrator' and ticket['created_by'] != current_user.ID:
 
         flash( 'You\'re not allowed to do that!', 'error' )
 
         return redirect( url_for( 'portal.index' ) )
     
     # Retrieve the ticket comments and the ticket user
-    comments = Comments.get_comments_by_ticket_id( ticket['ID'] )
-    user     = Users.get_user_by( 'ID', ticket['created_by'] )
+    comments = Comments.get_comments_by_ticket_id( ticket.ID )
+    user     = Users.get_user_by( 'ID', ticket.created_by )
     
     return render_template( 'portal/ticket.html', ticket=ticket, comments=comments, user=user )
 
@@ -160,8 +160,6 @@ def failed_logins():
 
     failed_logins = Failed_Logins.get_failed_logins()
 
-    print( failed_logins )
-
     return render_template( 'portal/failed_logins.html', failed_logins = failed_logins )
 
 # ROUTE - /post/create_ticket
@@ -194,8 +192,8 @@ def handler_create_ticket():
         return redirect( url_for( 'portal.new_ticket' ) )
     
     # Create the ticket and comment
-    ticket_id  = Tickets.create_ticket( subject, user.id )
-    comment_id = Comments.create_comment( ticket_id, user.id, comment )
+    ticket_id  = Tickets.create_ticket( subject, user.ID )
+    comment_id = Comments.create_comment( ticket_id, user.ID, comment )
 
     # Redirect to the newly created ticket
     return redirect( url_for( 'portal.ticket', id=ticket_id) )
@@ -230,7 +228,7 @@ def handler_update_ticket():
         return 'Invalid ticket ID'
     
     # Check the user can edit the ticket
-    if user.role != 'administrator' and ticket['created_by'] != user.id:
+    if user.role != 'administrator' and ticket['created_by'] != user.ID:
         return 'You cannot edit this ticket'
     
     # Only admins can delete tickets
@@ -253,7 +251,7 @@ def handler_update_ticket():
 
         # Create the comment OR return error
         if( comment ) :
-            Comments.create_comment( ticket['ID'], user.id, comment )
+            Comments.create_comment( ticket['ID'], user.ID, comment )
         elif( not comment and action != 'resolved' ):
             flash( '<b>ERROR:</b> Comment cannot be empty', 'error' )
 
@@ -346,7 +344,7 @@ def handler_update_account():
 
     # If there are fields to update, perform an update
     if len( update ) > 0:
-        Users.update_user( user.id, update )
+        Users.update_user( user.ID, update )
 
     # Redirect with a success message
     flash( 'User account updated', 'success' )
@@ -450,7 +448,7 @@ def handler_edit_user():
     current_user = flask_login.current_user
 
     # User can't edit their own account (unless through the account form)
-    if( user.id == current_user.id ):
+    if( user.ID == current_user.ID ):
         flash( 'You cannot change your own role or delete your own account', 'error' )
         return redirect( url_for( 'portal.account' ) )
     
@@ -496,8 +494,8 @@ def handler_edit_user():
 
     # If there is an update to be made, update the user
     if len( update ) > 0:
-        Users.update_user( user.id, update )
+        Users.update_user( user.ID, update )
 
     flash( 'User account updated', 'success' )
    
-    return redirect( url_for( 'portal.user', id=user.id ) )
+    return redirect( url_for( 'portal.user', id=user.ID ) )
