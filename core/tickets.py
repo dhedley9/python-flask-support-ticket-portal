@@ -61,7 +61,6 @@ class Tickets():
 
         if updated:
             ticket.last_updated = datetime.today()
-            database.commit()
             return True
 
         return False

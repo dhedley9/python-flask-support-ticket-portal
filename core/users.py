@@ -6,7 +6,8 @@ import logging
 import core.config as config
 
 from core.database import database
-from models.user import User
+from core.user import User
+from models.user import User as User_Model
 from sqlalchemy import func
 
 from datetime import datetime
@@ -52,7 +53,7 @@ class Users():
             'date_created': date,
         }
 
-        user = User( data )
+        user = User_Model( data )
 
         database.add_model( user )
 
@@ -80,9 +81,6 @@ class Users():
             if key in allowed:
                 setattr( user, key, args[key] )
                 updated = True
-
-        if updated:
-            database.commit()
 
         return True
     
@@ -123,7 +121,35 @@ class Users():
         if field not in fields: 
             field = 'ID'
 
-        return database.get_model( User, { field: value } )
+        if field == 'ID':
+            value = int( value )
+        else:
+            value = str( value )
+
+        model = database.get_model( User_Model, { field: value } )
+
+        if( model == None ):
+            return False
+
+        args = {
+            'ID': model.ID,
+            'email': model.email,
+            'password': model.password,
+            'salt': model.salt,
+            'role': model.role,
+            'date_created': model.date_created,
+            'secret': model.secret,
+            'last_login': model.last_login,
+            'email_verification_code': model.email_verification_code,
+            'signup_email_sent': model.signup_email_sent,
+            'email_verified': model.email_verified,
+            'two_factor_enabled': model.two_factor_enabled
+        }
+
+        user = User( args )
+       
+        return user
+
     
     def get_users():
 
@@ -133,7 +159,7 @@ class Users():
         :return List - containing dictionaries
         """
 
-        users = database.get_models( User )
+        users = database.get_models( User_Model )
 
         return users
     
@@ -243,6 +269,6 @@ class Users():
     
     def admin_user_exists():
 
-        admin_count = database.session.query( func.count( User.ID )).filter( User.role == "administrator" ).scalar()
+        admin = database.get_model( User_Model, { 'role': 'administrator' } )
 
-        return admin_count > 0
+        return admin != None
