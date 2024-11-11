@@ -43,7 +43,7 @@ def login():
         user     = Users.get_user_by( 'email', email )
 
         # If there is a user and the (hashed) password match, log the user in
-        if user and user.password == Users.hash_password( password, user.salt, config.pepper ):
+        if user and Users.check_password( user, password ):
 
             flask_login.login_user( user )
 
