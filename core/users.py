@@ -2,11 +2,14 @@ import hashlib
 import os
 import re
 import logging
+import base64
 
 import core.config as config
 
-from core.database import Database
+from core.database import database
 from core.user import User
+from models.user import User as User_Model
+from sqlalchemy import func
 
 from datetime import datetime
 from pathlib import Path
@@ -36,7 +39,7 @@ class Users():
             return False
         
         # Get today's date and a random salt string
-        date   = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+        date   = datetime.today()
         salt   = os.urandom( 32 )
         pepper = config.pepper
 
@@ -45,16 +48,17 @@ class Users():
         
         data = {
             'email': email,
-            'password': hashed_password,
-            'salt': salt,
+            'password': base64.b64encode( hashed_password ).decode( 'utf-8' ),
+            'salt': base64.b64encode( salt ).decode( 'utf-8' ), # Convert to base64 for storage
             'role': role,
             'date_created': date,
         }
 
-        # Insert the user to the database
-        user_id = Database.insert( 'users', data )
+        user = User_Model( data )
 
-        return user_id
+        database.add_model( user )
+
+        return user.ID
     
     def update_user( ID, args ):
 
@@ -66,21 +70,23 @@ class Users():
 
         :return boolean
         """
+
+        # user       = Users.get_user_by( 'ID', ID )
+        user_model = database.get_model( User_Model, { 'ID': ID } )
         
         # Only allow certain fields to be updated
         allowed = ['email', 'password', 'role', 'last_login', 'secret', 'email_verified', 'email_verification_code', 'signup_email_sent', 'two_factor_enabled']
         clean   = {}
-        where   = { 'ID': ID }
 
         for key in args:
             
             if key in allowed:
                 clean[key] = args[key]
-
+        
         if len( clean ) == 0:
             return False
         
-        Database.update( 'users', clean, where )
+        database.update_model( user_model, clean )
 
         return True
     
@@ -94,9 +100,13 @@ class Users():
         :return True
         """
 
-        where = { 'ID': ID }
+        # user = Users.get_user_by( 'ID', ID )
+        user_model = database.get_model( User_Model, { 'ID': ID } )
 
-        Database.delete( 'users', where )
+        if user_model == None:
+            return False
+        
+        database.delete_model( user_model )
 
         return True
     
@@ -118,39 +128,35 @@ class Users():
         if field not in fields: 
             field = 'ID'
 
-        # Prepared query
-        sql = 'SELECT ID, email, password, salt, role, date_created, secret, email_verified, email_verification_code, signup_email_sent, two_factor_enabled, last_login FROM users WHERE ' + field + ' = ?'
+        if field == 'ID':
+            value = int( value )
+        else:
+            value = str( value )
 
-        value  = [value]
-        value  = tuple( value )
-        
-        result = Database.get_row( sql, value )
+        model = database.get_model( User_Model, { field: value } )
 
-        # Check there is a user
-        if( result == None ) :
+        if( model == None ):
             return False
-        
-        # Convert to standardised dictionary
-        userdata = {
-            'ID': result[0],
-            'email': result[1],
-            'password': result[2],
-            'salt': result[3],
-            'role': result[4],
-            'date_created': datetime.strptime( result[5], '%Y-%m-%d %H:%M:%S' ),
-            'secret': result[6],
-            'email_verified': result[7],
-            'email_verification_code': result[8],
-            'signup_email_sent': result[9],
-            'two_factor_enabled': result[10],
-            'last_login': result[11],
+
+        args = {
+            'ID': model.ID,
+            'email': model.email,
+            'password': model.password,
+            'salt': model.salt,
+            'role': model.role,
+            'date_created': model.date_created,
+            'secret': model.secret,
+            'last_login': model.last_login,
+            'email_verification_code': model.email_verification_code,
+            'signup_email_sent': model.signup_email_sent,
+            'email_verified': model.email_verified,
+            'two_factor_enabled': model.two_factor_enabled
         }
 
-        if userdata['last_login'] != None:
-            userdata['last_login'] = datetime.strptime( userdata['last_login'], '%Y-%m-%d %H:%M:%S' )
+        user = User( args )
+       
+        return user
 
-        # Create a user object
-        return User( userdata )
     
     def get_users():
 
@@ -160,29 +166,7 @@ class Users():
         :return List - containing dictionaries
         """
 
-        sql = 'SELECT ID, email, password, salt, role, date_created, last_login FROM users'
-
-        results = Database.get_results( sql )
-        users   = []
-
-        # Organise results into dictionaries
-        for row in results:
-
-            userdata = {
-                'ID': row[0],
-                'email': row[1],
-                'password': row[2],
-                'salt': row[3],
-                'role': row[4],
-                'date_created': datetime.strptime( row[5], '%Y-%m-%d %H:%M:%S' ),
-                'last_login': row[6],
-            }
-
-            # If there is a value for the last login, convert into a datetime
-            if userdata['last_login'] != None:
-                userdata['last_login'] = datetime.strptime( userdata['last_login'], '%Y-%m-%d %H:%M:%S' )
-
-            users.append( userdata )
+        users = database.get_models( User_Model )
 
         return users
     
@@ -242,7 +226,7 @@ class Users():
         :param ID - (int) the user ID
         """
         
-        last_login = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+        last_login = datetime.today()
 
         Users.update_user( ID, { 'last_login': last_login } )
 
@@ -289,3 +273,27 @@ class Users():
             config.users_logger = custom_logger
         
         return config.users_logger
+    
+    def admin_user_exists():
+
+        admin = database.get_model( User_Model, { 'role': 'administrator' } )
+
+        return admin != None
+    
+    def check_password( user, check_password ):
+
+        """
+        Check a password against a user's password
+
+        :param user - (User) the user object
+        :param check_password - (string) the password to check
+
+        :return boolean
+        """
+
+        salt = base64.b64decode( user.salt )
+
+        hashed_password = Users.hash_password( check_password, salt, config.pepper )
+        hashed_password = base64.b64encode( hashed_password ).decode( 'utf-8' )
+
+        return user.password == hashed_password

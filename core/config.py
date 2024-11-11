@@ -17,3 +17,11 @@ mailgun_region  = os.getenv( 'MAILGUN_REGION' )
 # These variables are loaded later in the application
 abspath      = None
 users_logger = None
+
+# Database connection
+db_url = os.getenv( 'DATABASE_URL' )
+
+# Database session - used only for initialisation process (see core.init), not for the application itself. Sessions are handled per request
+
+init_use_db_session = None # Toggle this to True to create a session for the setup process
+init_db_session     = None # This is for use by the Database class only

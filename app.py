@@ -1,33 +1,28 @@
 import flask_login
 import bleach
 
-from flask import Flask, request, redirect, url_for, render_template, flash, session
+from flask import Flask, request, redirect, url_for, g
 from flask_wtf.csrf import CSRFProtect
 
 import core.config as config
 config.abspath = __file__
 
-from core.database import Database
+from core.database import database
 from core.users import Users
-from core.user import User
 from core.tickets import Tickets
 from core.comments import Comments
 from core.auth import Auth
 from core.failed_logins import Failed_Logins
 from core.mailer import Mailer
+from core.init import Init
+
+from models import User, Ticket, Comment, Failed_Login, Base
 
 # Import Blueprints
 from routes.auth_routes import auth_bp
 from routes.portal_routes import portal_bp
 
-# Create the database tables and the default admin user, if they don't exist
-Database.create_default_tables()
-count = Database.get_var( 'SELECT count( ID ) FROM users WHERE role = "administrator" LIMIT 1' )
-count = int( count )
-
-if count == 0:
-    admin_id = Users.create_user( config.default_admin_email, config.default_admin_password, 'administrator' )
-    Users.update_user( admin_id, { 'email_verified': 1 } )
+Init().run()
 
 app            = Flask( __name__ )
 app.secret_key = config.secret_key
@@ -47,8 +42,15 @@ def load_user( user_id ):
 # Unauthorized handler to redirect to login page
 @login_manager.unauthorized_handler
 def handle_needs_login():
-                        
-    return redirect( url_for( 'auth.login' ) ) 
+    return redirect( url_for( 'auth.login' ) )
+
+@app.teardown_appcontext
+def shutdown_session( exception = None ):
+    database.close_session()
+
+# Register Blueprints
+app.register_blueprint( auth_bp )
+app.register_blueprint( portal_bp )
 
 # Middleware for production environment
 if config.environment == "production":
@@ -70,12 +72,13 @@ if config.environment == "production":
 def enforce_two_factor():
 
     endpoint = request.endpoint
+
+    if endpoint is None or endpoint.startswith('auth.') or endpoint == 'static':
+        return
+    
     user     = flask_login.current_user
 
     if( not user or user.is_anonymous ):
-        return
-    
-    if endpoint is None or endpoint.startswith('auth.') or endpoint == 'static':
         return
     
     # If the user has not verified their email, redirect to the email verification page
@@ -92,10 +95,6 @@ def enforce_two_factor():
     elif( user.two_factor_auth == False and user.two_factor_enabled == True ):
 
         return redirect( url_for( 'auth.login_2fa' ) )
-
-# Register Blueprints
-app.register_blueprint( auth_bp )
-app.register_blueprint( portal_bp )
 
 if __name__ == '__main__':
     app.run()

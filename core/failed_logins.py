@@ -1,18 +1,16 @@
 import math
 
-from core.database import Database
+from core.database import database
+from models.failed_login import Failed_Login
 from datetime import datetime
 
 class Failed_Logins():
 
     def log_failed_login( ip_address ):
 
-        date   = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
-        values = tuple( [ip_address] )
+        date   = datetime.today()
 
-        sql = 'SELECT ID, ip_address, attempts, last_attempt FROM failed_logins WHERE ip_address = ?;'
-
-        record = Database.get_row( sql, values )
+        record = database.get_model( Failed_Login, { 'ip_address': ip_address } )
 
         # No previous record
         if record == None:
@@ -23,78 +21,53 @@ class Failed_Logins():
                 'last_attempt': date 
             }
 
-            Database.insert( 'failed_logins', data )
+            record = Failed_Login( data )
+            database.add_model( record )
         
         else:
-
-            attempts = int( record[2] ) + 1
             
-            data = {
-                'attempts': attempts,
-                'last_attempt': date
-            }
-
-            where = {
-                'ID': record[0]
-            }
-
-            Database.update( 'failed_logins', data, where )
+            record.attempts     = record.attempts + 1
+            record.last_attempt = date
     
     def is_ip_locked( ip_address ):
 
-        values = tuple( [ip_address] )
-
-        sql = 'SELECT ID, ip_address, attempts, last_attempt FROM failed_logins WHERE ip_address = ?;'
-
-        record = Database.get_row( sql, values )
+        record = database.get_model( Failed_Login, { 'ip_address': ip_address } )
 
         # No previous record
         if record == None:
             return False
 
         # Check if the last attempt was within the last 5 minutes
-        last_attempt = datetime.strptime( record[3], '%Y-%m-%d %H:%M:%S' )
         now          = datetime.today()
-        difference   = now - last_attempt
+        difference   = now - record.last_attempt
 
         if difference.total_seconds() > 300:
             return False
 
         # Check the number of attempts
-        if int( record[2] ) > 4:
+        if int( record.attempts ) > 4:
             return True
         
         return False
     
     def clear_failed_logins( ip_address ):
 
-        where = {
-            'ip_address': ip_address
-        }
+        record = database.get_model( Failed_Login, { 'ip_address': ip_address } )
 
-        Database.delete( 'failed_logins', where )
+        if record != None:
+            database.delete_model( record )
 
     def get_failed_logins():
 
-        sql     = 'SELECT ID, ip_address, attempts, last_attempt FROM failed_logins;'
-        results = Database.get_results( sql )
-        logins  = []
+        results = database.get_models( Failed_Login, {} )
         now     = datetime.today()
 
         for result in results:
-            
-            login = {
-                'ID': result[0],
-                'ip_address': result[1],
-                'attempts': result[2],
-                'last_attempt': result[3]
-            }
 
-            date       = datetime.strptime( result[3], '%Y-%m-%d %H:%M:%S' )
-            difference = now - date
+            difference = now - result.last_attempt
 
             if difference.total_seconds() > 300:
-                status      = 'Unlocked'
+                status = 'Unlocked'
             else:
                 unlock_time = 300 - difference.total_seconds()
                 unlock_time = math.ceil( unlock_time / 60 )
@@ -104,8 +77,6 @@ class Failed_Logins():
                 else:
                     status = 'Locked for ' + str( unlock_time ) + ' minutes'
 
-            login['status']      = status
-
-            logins.append( login )
+            result.status = status
         
-        return logins
+        return results
