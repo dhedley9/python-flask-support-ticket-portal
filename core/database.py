@@ -57,6 +57,8 @@ class Database():
         """
 
         if( hasattr( g, 'db_session' ) == True ):
+
+            g.db_session.commit()
             g.db_session.close()
             delattr( g, 'db_session' )
     
