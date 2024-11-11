@@ -124,6 +124,8 @@ class Database():
         if( session_data['is_anonymous'] == True ):
             session.commit()
             session.close()
+        else:
+            session.flush()
 
     
     def delete_model( self, model ):
@@ -140,5 +142,7 @@ class Database():
         if( session_data['is_anonymous'] == True ):
             session.commit()
             session.close()
+        else:    
+            session.flush()
 
 database = Database()
