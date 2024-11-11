@@ -122,24 +122,3 @@ class Tickets():
         """
 
         return database.get_model( Ticket, { 'ID': ID } )
-    
-    def get_status_label( status ):
-
-        """
-        Get a status label from a status name
-
-        :param status - (string) the status
-
-        :return string
-        """
-
-        statuses = {
-            'active': 'Awaiting Staff Reply',
-            'pending': 'Awaiting Client Reply',
-            'complete': 'Resolved'
-        }
-
-        if status in statuses:
-            return statuses[status]
-        
-        return status
