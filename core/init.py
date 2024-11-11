@@ -32,8 +32,6 @@ class Init:
 
             admin_id = Users.create_user( config.default_admin_email, config.default_admin_password, 'administrator' )    
 
-            print( 'created admin', admin_id )
-
             Users.update_user( admin_id, { 'email_verified': 1 } )
 
     def create_default_tickets( self, user_id ):
