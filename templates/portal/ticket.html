@@ -16,11 +16,11 @@
         </div>
         <div class="ticket-info__item">
             <div class="ticket-info__item__label">Date Created</div>
-            <div class="ticket-info__item__value">{{ ticket.date_created }}</div>
+            <div class="ticket-info__item__value">{{ ticket.get_date_created() }}</div>
         </div>
         <div class="ticket-info__item">
             <div class="ticket-info__item__label">Last Updated</div>
-            <div class="ticket-info__item__value">{{ ticket.last_updated }}</div>
+            <div class="ticket-info__item__value">{{ ticket.get_last_updated() }}</div>
         </div>
     </div>
 

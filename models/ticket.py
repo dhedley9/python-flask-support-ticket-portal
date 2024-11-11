@@ -32,3 +32,9 @@ class Ticket( Base ):
             return statuses[self.status]
         
         return self.status
+    
+    def get_date_created( self, format ='%Y-%m-%d %H:%M:%S' ):
+        return self.date_created.strftime( format )
+    
+    def get_last_updated( self, format ='%Y-%m-%d %H:%M:%S' ):
+        return self.last_updated.strftime( format )
