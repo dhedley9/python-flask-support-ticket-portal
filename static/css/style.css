@@ -306,6 +306,7 @@ body.page-auth-access-locked #login-form .lock-icon{
     padding-bottom: 40px;
     max-height: 100vh;
     display: flex;
+    flex-wrap: wrap;
 }
 
 body.sidebar-menu-closed .portal-wrap{
