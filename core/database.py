@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from flask import g, has_request_context
 
-
 class Database():
 
     url           = None
@@ -53,7 +52,7 @@ class Database():
         """
 
         if has_request_context():
-            session.flush()
+            session.commit()
         elif config.init_use_db_session is True:
             session.flush()
         else:
@@ -135,6 +134,18 @@ class Database():
 
         self.commit( session )
 
+    def update_model( self, model, args ):
+            
+        """
+        Update a model in the database
+        """
+
+        session = self.get_session()
+
+        for key in args:
+            setattr( model, key, args[key] )
+
+        self.commit( session )
     
     def delete_model( self, model ):
             
