@@ -70,7 +70,8 @@ class Users():
         :return boolean
         """
 
-        user = Users.get_user_by( 'ID', ID )
+        # user       = Users.get_user_by( 'ID', ID )
+        user_model = database.get_model( User_Model, { 'ID': ID } )
         
         # Only allow certain fields to be updated
         allowed = ['email', 'password', 'role', 'last_login', 'secret', 'email_verified', 'email_verification_code', 'signup_email_sent', 'two_factor_enabled']
@@ -79,10 +80,10 @@ class Users():
         for key in args:
             
             if key in allowed:
-                setattr( user, key, args[key] )
+                setattr( user_model, key, args[key] )
                 updated = True
 
-        return True
+        return updated
     
     def delete_user( ID ):
 
