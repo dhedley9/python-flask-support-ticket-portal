@@ -1,9 +1,3 @@
-from models import User, Ticket, Comment, Failed_Login, Base
-from core.database import database
-
-# Create the database tables
-database.create_tables( Base )
-
 import flask_login
 import bleach
 
@@ -13,22 +7,22 @@ from flask_wtf.csrf import CSRFProtect
 import core.config as config
 config.abspath = __file__
 
-from core.database import Database
+from core.database import database
 from core.users import Users
 from core.tickets import Tickets
 from core.comments import Comments
 from core.auth import Auth
 from core.failed_logins import Failed_Logins
 from core.mailer import Mailer
+from core.init import Init
+
+from models import User, Ticket, Comment, Failed_Login, Base
 
 # Import Blueprints
 from routes.auth_routes import auth_bp
 from routes.portal_routes import portal_bp
 
-# Create the default admin user, if it doesn't exist
-if Users.admin_user_exists() == False:
-    admin_id = Users.create_user( config.default_admin_email, config.default_admin_password, 'administrator' )    
-    Users.update_user( admin_id, { 'email_verified': 1 } )
+Init().run()
 
 app            = Flask( __name__ )
 app.secret_key = config.secret_key
