@@ -34,7 +34,7 @@ class Users():
         user = Users.get_user_by( 'email', email )
 
         # Check there isn't already a user with that email address
-        if( user != None ) :
+        if( user != False ) :
             return False
         
         # Get today's date and a random salt string
