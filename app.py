@@ -52,7 +52,7 @@ def handle_needs_login():
 
 @app.teardown_appcontext
 def shutdown_session( exception = None ):
-    database.close_request()
+    database.close_session()
 
 # Register Blueprints
 app.register_blueprint( auth_bp )
