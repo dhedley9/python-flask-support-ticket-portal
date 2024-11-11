@@ -24,3 +24,13 @@ class User( UserMixin, Base ):
         
         for key in args:
             setattr( self, key, args[key] )
+    
+    def get_date_created( self, format ='%Y-%m-%d %H:%M:%S' ):
+        return self.date_created.strftime( format )
+    
+    def get_last_login( self, format ='%Y-%m-%d %H:%M:%S' ):
+
+        if self.last_login == None:
+            return None
+        
+        return self.last_login.strftime( format )
