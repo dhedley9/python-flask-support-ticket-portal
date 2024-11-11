@@ -54,8 +54,8 @@ def ticket( id ):
     - Ticket ID required
     """
 
-    current_user   = flask_login.current_user
-    ticket = Tickets.get_ticket( id )
+    current_user = flask_login.current_user
+    ticket       = Tickets.get_ticket( id )
 
     # Check the ticket ID returns a valid ticket
     if False == ticket:
@@ -65,7 +65,7 @@ def ticket( id ):
         return redirect( url_for( 'portal.index' ) )
     
     # Check the current user can access the ticket
-    if current_user.role != 'administrator' and ticket['created_by'] != current_user.ID:
+    if current_user.role != 'administrator' and ticket.created_by != current_user.ID:
 
         flash( 'You\'re not allowed to do that!', 'error' )
 
@@ -228,7 +228,7 @@ def handler_update_ticket():
         return 'Invalid ticket ID'
     
     # Check the user can edit the ticket
-    if user.role != 'administrator' and ticket['created_by'] != user.ID:
+    if user.role != 'administrator' and ticket.created_by != user.ID:
         return 'You cannot edit this ticket'
     
     # Only admins can delete tickets
@@ -238,7 +238,7 @@ def handler_update_ticket():
     # Delete the ticket
     if action == 'delete':
 
-        Tickets.delete_ticket( ticket['ID'] )
+        Tickets.delete_ticket( ticket.ID )
         flash( 'Ticket deleted', 'success' )
 
         return redirect( url_for( 'portal.index' ) )
@@ -251,26 +251,26 @@ def handler_update_ticket():
 
         # Create the comment OR return error
         if( comment ) :
-            Comments.create_comment( ticket['ID'], user.ID, comment )
+            Comments.create_comment( ticket.ID, user.ID, comment )
         elif( not comment and action != 'resolved' ):
             flash( '<b>ERROR:</b> Comment cannot be empty', 'error' )
 
-            return redirect( url_for( 'portal.ticket', id=ticket['ID'] ) )
+            return redirect( url_for( 'portal.ticket', id=ticket.ID ) )
         
         # Mark the ticket as resolved
         if( action == 'resolved' ):
-            Tickets.update_ticket( ticket['ID'], { 'status': 'complete' } )
+            Tickets.update_ticket( ticket.ID, { 'status': 'complete' } )
         # If an admin commented - mark as 'pending'
         elif( user.is_admin() ):
-            Tickets.update_ticket( ticket['ID'], { 'status': 'pending' } )
+            Tickets.update_ticket( ticket.ID, { 'status': 'pending' } )
         # If a normal user commented - mark as 'active'
         else:
-            Tickets.update_ticket( ticket['ID'], { 'status': 'active' } )
+            Tickets.update_ticket( ticket.ID, { 'status': 'active' } )
 
         flash( 'Ticket updated', 'success' )
 
         # Redirect to the ticket page
-        return redirect( url_for( 'portal.ticket', id=ticket['ID'] ) )
+        return redirect( url_for( 'portal.ticket', id=ticket.ID ) )
 
 # ROUTE - /post/update_account  
 @portal_bp.route( '/post/update_account', methods=['POST'] )
