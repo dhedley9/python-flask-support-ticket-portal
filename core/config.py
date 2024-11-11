@@ -21,6 +21,10 @@ users_logger = None
 # Database connection
 db_url = os.getenv( 'DATABASE_URL' )
 
+# Convert the database URL to a PostgreSQL URL (Heroku uses postgres:// but SQLAlchemy uses postgresql://)
+if db_url.startswith('postgres://'):
+    db_url = db_url.replace('postgres://', 'postgresql://', 1)
+
 # Database session - used only for initialisation process (see core.init), not for the application itself. Sessions are handled per request
 
 init_use_db_session = None # Toggle this to True to create a session for the setup process
