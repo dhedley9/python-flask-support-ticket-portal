@@ -16,12 +16,15 @@ pipelines:
             - qa-software-engineering-devops.tar.gz
       - step:
           name: Test
+          services:
+            - postgres
           caches:
             - pip
           script:
             - python -m venv venv
             - source venv/bin/activate
             - pip install -r requirements.txt
+            - pip install psycopg2-binary
             - pip install pytest pytest-flask
             - pytest --maxfail=1 --disable-warnings
       - step:
