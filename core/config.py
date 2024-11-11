@@ -17,3 +17,6 @@ mailgun_region  = os.getenv( 'MAILGUN_REGION' )
 # These variables are loaded later in the application
 abspath      = None
 users_logger = None
+
+# Database connection
+db_url = os.getenv( 'DATABASE_URL' )

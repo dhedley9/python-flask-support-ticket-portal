@@ -11,7 +11,7 @@ class Database():
 
     def __init__( self ):
 
-        self.url    = 'sqlite:///sql/database.db'
+        self.url    = config.db_url
         self.engine = create_engine( self.url )
 
     def create_tables( self, Base ):
