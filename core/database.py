@@ -7,10 +7,15 @@ class Database():
 
     url           = None
     engine        = None
+    auto_commit   = True
 
-    def __init__( self ):
+    def __init__( self, db_url = None ):
 
-        self.url    = config.db_url
+        if( db_url != None ):
+            self.url = db_url
+        else:
+            self.url = config.db_url
+
         self.engine = create_engine( self.url )
 
     def create_tables( self, Base ):
@@ -51,9 +56,9 @@ class Database():
         Commit the changes to the session
         """
 
-        if has_request_context():
+        if ( has_request_context() ) and ( self.auto_commit is True ):
             session.commit()
-        elif config.init_use_db_session is True:
+        elif ( config.init_use_db_session is True ) or ( self.auto_commit is False ):
             session.flush()
         else:
             session.commit()
