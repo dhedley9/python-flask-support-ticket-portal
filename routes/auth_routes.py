@@ -303,7 +303,13 @@ def handler_create_account():
         flash( 'Passwords must match', 'error' )
         return redirect( url_for( 'auth.register' ) )
     
-     # Define regular expressions for password validation
+    is_strong = Auth.is_password_strong( clean_password )
+
+    if( is_strong != True ):
+        flash( is_strong, 'error' )
+        return redirect( url_for( 'auth.register' ) )
+    
+    # Define regular expressions for password validation
     has_uppercase = any( char.isupper() for char in clean_password )
     has_lowercase = any( char.islower() for char in clean_password )
     has_number    = any( char.isdigit() for char in clean_password )
