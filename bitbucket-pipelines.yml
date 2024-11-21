@@ -38,6 +38,8 @@ pipelines:
                 HEROKU_API_KEY: $HEROKU_API_KEY
                 HEROKU_APP_NAME: $HEROKU_APP_NAME
                 ZIP_FILE: qa-software-engineering-devops.tar.gz
+          # Run migrations on the live Heroku environment
+            - heroku run flask db upgrade --app $HEROKU_APP_NAME
 definitions:
   services:
     postgres:
