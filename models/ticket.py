@@ -11,6 +11,7 @@ class Ticket( Base ):
     created_by   = Column( Integer, ForeignKey('users.ID'), nullable=False )
     date_created = Column( DateTime, nullable=False )
     last_updated = Column( DateTime, nullable=False )
+    client_id    = Column( Integer, ForeignKey('users.ID'), nullable=False )
 
     def __init__( self, args = None ):
         
