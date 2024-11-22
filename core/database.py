@@ -1,5 +1,5 @@
 import core.config as config
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, desc, asc
 from sqlalchemy.orm import sessionmaker
 from flask import g, has_request_context
 
@@ -110,18 +110,34 @@ class Database():
 
         return result
     
-    def get_models( self, model, filters = {} ):
+    def get_models( self, model, filters = {}, order = {} ):
             
         """
         Get a list of models from the database
         """
 
         session = self.get_session()
+        query   = session.query( model )
 
-        if( len( filters ) == 0 ):
-            result = session.query( model ).all()
-        else:
-            result = session.query( model ).filter_by( **filters ).all()
+        # Apply filters to the query
+        if( len( filters ) > 0 ):
+            query = query.filter_by( **filters )
+        
+        # Apply ordering to the query
+        if( 'order_by' in order ):
+
+            order_by  = order['order_by']
+            order_dir = 'asc'
+
+            if( 'order_dir' in order ):
+                order_dir = order['order_dir'].lower()
+                        
+            if( order_dir == 'desc' ):
+                query = query.order_by( desc( order_by ) )
+            else:
+                query = query.order_by( asc( order_by ) )
+
+        result = query.all()
         
         self.commit( session )
 

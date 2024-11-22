@@ -12,6 +12,15 @@
 
         <textarea placeholder="Ticket comments" name="comment"></textarea>
 
+        {% if current_user.is_admin() %}
+            <select name="client_id">
+                <option value="">Select Client</option>
+                {% for user in users %}
+                    <option value="{{ user.ID }}">{{ user.email }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
+
         <div class="ticket-update__actions">
             <button type="submit" name="action" class="button button-primary" value="update" onclick="return confirm('Are you sure you want create a new ticket?')">Create Ticket</button>
         </div>

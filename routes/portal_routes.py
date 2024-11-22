@@ -21,12 +21,16 @@ def index():
     - Login required
     """
 
-    args = {}
+    args  = {}
+    order = {
+        'order_by': 'last_updated',
+        'order_dir': 'desc'
+    }
 
     if( not flask_login.current_user.is_admin() ):
-        args['created_by'] = flask_login.current_user.ID
+        args['client_id'] = flask_login.current_user.ID
     
-    tickets = Tickets.get_tickets( args )
+    tickets = Tickets.get_tickets( args, order )
     return render_template( 'portal/index.html', tickets = tickets )
 
 # ROUTE - /account
@@ -65,7 +69,7 @@ def ticket( id ):
         return redirect( url_for( 'portal.index' ) )
     
     # Check the current user can access the ticket
-    if current_user.role != 'administrator' and ticket.created_by != current_user.ID:
+    if current_user.role != 'administrator' and ticket.client_id != current_user.ID:
 
         flash( 'You\'re not allowed to do that!', 'error' )
 
@@ -73,9 +77,9 @@ def ticket( id ):
     
     # Retrieve the ticket comments and the ticket user
     comments = Comments.get_comments_by_ticket_id( ticket.ID )
-    user     = Users.get_user_by( 'ID', ticket.created_by )
+    client   = Users.get_user_by( 'ID', ticket.client_id )
     
-    return render_template( 'portal/ticket.html', ticket=ticket, comments=comments, user=user )
+    return render_template( 'portal/ticket.html', ticket=ticket, comments=comments, client=client )
 
 # ROUTE - /ticket/new
 @portal_bp.route('/ticket/new')
@@ -87,7 +91,13 @@ def new_ticket():
     - Login required
     """
 
-    return render_template( 'portal/ticket-new.html' )
+    current_user = flask_login.current_user
+    users        = False
+
+    if( current_user.is_admin() ) :
+        users = Users.get_users( 'standard' )
+
+    return render_template( 'portal/ticket-new.html', users=users )
 
 # ROUTE - /users
 @portal_bp.route( '/users' )
@@ -178,6 +188,24 @@ def handler_create_ticket():
     subject   = request.form.get( 'subject' )
     comment   = request.form.get( 'comment' )
 
+    if( user.is_admin() ):
+        client_id = request.form.get( 'client_id' )
+
+        try:
+            client_id = int( client_id )
+        except:
+            flash( 'Invalid client ID', 'error' )
+            return redirect( url_for( 'portal.new_ticket' ) )
+        
+        client = Users.get_user_by( 'ID', client_id )
+
+        if( client == False or client.role != 'standard' ):
+            flash( 'Invalid client ID', 'error' )
+            return redirect( url_for( 'portal.new_ticket' ) )
+    
+    else:
+        client = user
+
     # Swap out new lines for HTML line breaks and allow when sanitising
     allowed_tags = ['br']
     comment      = comment.replace("\n", "<br>")
@@ -192,7 +220,7 @@ def handler_create_ticket():
         return redirect( url_for( 'portal.new_ticket' ) )
     
     # Create the ticket and comment
-    ticket_id  = Tickets.create_ticket( subject, user.ID )
+    ticket_id  = Tickets.create_ticket( subject, user.ID, client.ID )
     comment_id = Comments.create_comment( ticket_id, user.ID, comment )
 
     # Redirect to the newly created ticket
@@ -228,7 +256,7 @@ def handler_update_ticket():
         return 'Invalid ticket ID'
     
     # Check the user can edit the ticket
-    if user.role != 'administrator' and ticket.created_by != user.ID:
+    if user.role != 'administrator' and ticket.client_id != user.ID:
         return 'You cannot edit this ticket'
     
     # Only admins can delete tickets
