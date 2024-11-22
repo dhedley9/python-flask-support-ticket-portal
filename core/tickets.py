@@ -1,4 +1,5 @@
 from core.database import database
+from core.comments import Comments
 from models.ticket import Ticket
 from datetime import datetime
 
@@ -82,6 +83,11 @@ class Tickets():
 
         if ticket == False:
             return False
+        
+        comments = Comments.get_comments_by_ticket_id( ID )
+
+        for comment in comments:
+            database.delete_model( comment )
         
         database.delete_model( ticket )
 
