@@ -9,6 +9,9 @@ from flask_migrate import Migrate
 import core.config as config
 config.abspath = __file__
 
+db      = SQLAlchemy()
+migrate = Migrate()
+
 from core.database import database
 from core.users import Users
 from core.tickets import Tickets
@@ -33,8 +36,8 @@ app.config['SQLALCHEMY_DATABASE_URI']        = config.db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Intialise Flask Migration
-db      = SQLAlchemy( app )
-migrate = Migrate( app, db )
+db.init_app( app )
+migrate.init_app( app, db )
 
 # Login manager compatability
 login_manager  = flask_login.LoginManager()
