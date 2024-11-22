@@ -158,7 +158,7 @@ class Users():
         return user
 
     
-    def get_users():
+    def get_users( role = None ):
 
         """
         Retrieve all the users
@@ -166,7 +166,10 @@ class Users():
         :return List - containing dictionaries
         """
 
-        users = database.get_models( User_Model )
+        if role != None:
+            users = database.get_models( User_Model, { 'role': role } )
+        else:
+            users = database.get_models( User_Model )
 
         return users
     

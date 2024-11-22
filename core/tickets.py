@@ -8,7 +8,7 @@ class Tickets():
     Class containing useful methods for tickets
     """
 
-    def create_ticket( title, user_id, status = 'active' ):
+    def create_ticket( title, user_id, client_id, status = 'active' ):
 
         """
         Create a new ticket
@@ -26,6 +26,7 @@ class Tickets():
             'title': title,
             'status': status,
             'created_by': user_id,
+            'client_id': client_id,
             'date_created': date,
             'last_updated': date,
         }

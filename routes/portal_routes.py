@@ -87,7 +87,13 @@ def new_ticket():
     - Login required
     """
 
-    return render_template( 'portal/ticket-new.html' )
+    current_user = flask_login.current_user
+    users        = False
+
+    if( current_user.is_admin() ) :
+        users = Users.get_users( 'standard' )
+
+    return render_template( 'portal/ticket-new.html', users=users )
 
 # ROUTE - /users
 @portal_bp.route( '/users' )
@@ -178,6 +184,26 @@ def handler_create_ticket():
     subject   = request.form.get( 'subject' )
     comment   = request.form.get( 'comment' )
 
+    if( user.is_admin() ):
+        client_id = request.form.get( 'client_id' )
+
+        print( 'client_id', client_id )
+
+        try:
+            client_id = int( client_id )
+        except:
+            flash( 'Invalid client ID', 'error' )
+            return redirect( url_for( 'portal.new_ticket' ) )
+        
+        client = Users.get_user_by( 'ID', client_id )
+
+        if( client == False or client.role != 'standard' ):
+            flash( 'Invalid client ID', 'error' )
+            return redirect( url_for( 'portal.new_ticket' ) )
+    
+    else:
+        client = user
+
     # Swap out new lines for HTML line breaks and allow when sanitising
     allowed_tags = ['br']
     comment      = comment.replace("\n", "<br>")
@@ -192,7 +218,7 @@ def handler_create_ticket():
         return redirect( url_for( 'portal.new_ticket' ) )
     
     # Create the ticket and comment
-    ticket_id  = Tickets.create_ticket( subject, user.ID )
+    ticket_id  = Tickets.create_ticket( subject, user.ID, client.ID )
     comment_id = Comments.create_comment( ticket_id, user.ID, comment )
 
     # Redirect to the newly created ticket
