@@ -69,7 +69,7 @@ def ticket( id ):
         return redirect( url_for( 'portal.index' ) )
     
     # Check the current user can access the ticket
-    if current_user.role != 'administrator' and ticket.created_by != current_user.ID:
+    if current_user.role != 'administrator' and ticket.client_id != current_user.ID:
 
         flash( 'You\'re not allowed to do that!', 'error' )
 
