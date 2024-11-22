@@ -52,19 +52,21 @@ class Tickets():
 
         # List of fields that can be updated
         allowed = ['title', 'status', 'created_by']
-        updated = False
+        clean   = {}
 
         for key in args:
             
             if key in allowed:
-                setattr( ticket, key, args[key] )
-                updated = True
+                clean[key] = args[key]
 
-        if updated:
-            ticket.last_updated = datetime.today()
-            return True
+        if len( clean ) <= 0:
+            return False
+        
+        clean['last_updated'] = datetime.today()
 
-        return False
+        database.update_model( ticket, clean )
+
+        return True
     
     def delete_ticket( ID ):
 
