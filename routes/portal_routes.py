@@ -77,9 +77,9 @@ def ticket( id ):
     
     # Retrieve the ticket comments and the ticket user
     comments = Comments.get_comments_by_ticket_id( ticket.ID )
-    user     = Users.get_user_by( 'ID', ticket.created_by )
+    client   = Users.get_user_by( 'ID', ticket.client_id )
     
-    return render_template( 'portal/ticket.html', ticket=ticket, comments=comments, user=user )
+    return render_template( 'portal/ticket.html', ticket=ticket, comments=comments, client=client )
 
 # ROUTE - /ticket/new
 @portal_bp.route('/ticket/new')

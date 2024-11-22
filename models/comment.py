@@ -15,3 +15,9 @@ class Comment( Base ):
         
         for key in args:
             setattr( self, key, args[key] )
+
+    def get_user( self ):
+
+        from core.users import Users
+
+        return Users.get_user_by( 'ID', self.user_id )
