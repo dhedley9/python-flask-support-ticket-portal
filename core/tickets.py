@@ -85,7 +85,7 @@ class Tickets():
 
         return True
 
-    def get_tickets( args = {} ) :
+    def get_tickets( args = {}, order = {} ):
 
         """
         Retrieve tickets based on a set of arguments
@@ -110,7 +110,7 @@ class Tickets():
 
                     filters[key] = args[key]
 
-        return database.get_models( Ticket, filters )
+        return database.get_models( Ticket, filters, order )
     
     def get_ticket( ID ) :
 

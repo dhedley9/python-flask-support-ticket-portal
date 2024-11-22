@@ -21,12 +21,16 @@ def index():
     - Login required
     """
 
-    args = {}
+    args  = {}
+    order = {
+        'order_by': 'last_updated',
+        'order_dir': 'desc'
+    }
 
     if( not flask_login.current_user.is_admin() ):
         args['client_id'] = flask_login.current_user.ID
     
-    tickets = Tickets.get_tickets( args )
+    tickets = Tickets.get_tickets( args, order )
     return render_template( 'portal/index.html', tickets = tickets )
 
 # ROUTE - /account
