@@ -1,6 +1,6 @@
 jQuery( function($){
 
-    $('#register_password').on('input', function(){
+    $('input[name="password"]').on('input', function(){
         
         let value = $(this).val();
 
