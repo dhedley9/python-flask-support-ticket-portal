@@ -8,15 +8,24 @@
     <form class="ticket-update" method="post" action="{{ url_for( 'portal.handler_new_user' ) }}">
 
         <div class="form-field">
-            <label for="email">Email Address:</label>
-            <input type="text" id="email" name="email" required="required" value="">
+            <label for="eamil">Email Address:</label>
+        
+            <div class="icon">
+                <i class="fa-solid fa-user"></i>
+            </div>
+        
+            <input type="text" id="email" name="email" value="" required="required" placeholder="Email Address">
         </div>
 
         <div class="form-field">
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required="required" value="">
+            
+            <div class="icon">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+        
+            <input type="password" id="password" name="password" spellcheck="false" placeholder="Password">
         </div>
-
         <div class="form-field">
             <label for="role">Role:</label>
             <select name="role" id="role" required="required">
