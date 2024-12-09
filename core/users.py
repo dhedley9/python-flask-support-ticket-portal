@@ -8,6 +8,7 @@ import core.config as config
 
 from core.database import database
 from core.user import User
+from core.tickets import Tickets
 from models.user import User as User_Model
 from sqlalchemy import func
 
@@ -105,6 +106,11 @@ class Users():
 
         if user_model == None:
             return False
+        
+        tickets = Tickets.get_tickets( { 'client_id': ID } )
+
+        for ticket in tickets:
+            Tickets.delete_ticket( ticket.ID )
         
         database.delete_model( user_model )
 
