@@ -50,8 +50,8 @@ csrf = CSRFProtect( app )
 # Define a CSP policy to allow Font Awesome
 csp = {
     'default-src': ["'self'"],
-    'script-src': ["'self'", 'https://code.jquery.com', 'unsafe-inline'],  # Scripts
-    'style-src': ["'self'", 'https://cdnjs.cloudflare.com', 'unsafe-inline'],  # Styles
+    'script-src': ["'self'", 'https://code.jquery.com', "'unsafe-inline'"],  # Scripts
+    'style-src': ["'self'", 'https://cdnjs.cloudflare.com', "'unsafe-inline'"],  # Styles
     'font-src': ["'self'", 'https://cdnjs.cloudflare.com'],   # Fonts
     'img-src': ["'self'", "data:"],  # Images
 }
