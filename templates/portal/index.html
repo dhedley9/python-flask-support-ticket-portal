@@ -14,6 +14,9 @@
         <tr>
             <th>Ticket ID</th>
             <th>Title</th>
+            {% if current_user.is_admin() %}
+                <th>Client</th>
+            {% endif %}
             <th>Last Update</th>
             <th>Status</th>
             <th></th>
@@ -24,6 +27,9 @@
             <tr>
                 <td>{{ ticket.get_number() }}</td>
                 <td>{{ ticket.title }}</td>
+                {% if current_user.is_admin() %}
+                    <td>{{ ticket.get_client().email }}</td>
+                {% endif %}
                 <td>{{ ticket.get_last_updated() }}</td>
                 <td>{{ ticket.get_status_label() }}</td>
                 <td><a href="{{ url_for( 'portal.ticket', id=ticket.ID ) }}">View Ticket</td>

@@ -39,3 +39,9 @@ class Ticket( Base ):
     
     def get_last_updated( self, format ='%Y-%m-%d %H:%M:%S' ):
         return self.last_updated.strftime( format )
+    
+    def get_client( self ):
+        
+        from core.users import Users
+
+        return Users.get_user_by( 'ID', self.client_id )
