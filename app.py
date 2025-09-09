@@ -1,7 +1,7 @@
 import flask_login
 import bleach
 
-from flask import Flask, request, redirect, url_for, render_template, flash
+from flask import Flask, request, redirect, url_for, render_template, flash, session
 from flask_wtf.csrf import CSRFProtect
 
 import core.config as config
@@ -12,6 +12,7 @@ from core.users import Users
 from core.user import User
 from core.tickets import Tickets
 from core.comments import Comments
+from core.auth import Auth
 
 # Create the database tables and the default admin user, if they don't exist
 Database.create_default_tables()
@@ -39,7 +40,24 @@ def load_user( user_id ):
 # Unauthorized handler to redirect to login page
 @login_manager.unauthorized_handler
 def handle_needs_login():
+                        
     return redirect( url_for( 'login' ) ) 
+
+@app.before_request
+def enforce_two_factor():
+
+    endpoint = request.endpoint
+    user     = flask_login.current_user
+
+    if( not user or user.is_anonymous ):
+        return
+
+    if endpoint is None or endpoint in ['login', 'login_setup_2fa', 'login_setup_2fa_confirm', 'static']:
+        return
+        
+    if ( user.two_factor_auth == False ):
+        
+        return redirect( url_for( 'login_setup_2fa_confirm' ) )
 
 # ROUTE - Index
 @app.route( '/' )
@@ -107,6 +125,65 @@ def login():
 
     return render_template( 'login.html' )
 
+# ROUTE - /login/setup-2fa
+@app.route( '/login/setup-2fa', methods=['GET', 'POST'] )
+def login_setup_2fa():
+
+    """
+    Returns and handles the 2FA setup form
+    """
+
+    user = flask_login.current_user
+
+    secret = Auth.create_secret()
+    uri    = Auth.get_2fa_link( secret, user.email, 'TestSite' )
+    qr     = Auth.get_qr_code( uri )
+    image  = Auth.get_qr_code_img( qr )
+
+    Users.update_user( user.id, { 'secret': secret } )
+
+    confirm_url = url_for( 'login_setup_2fa_confirm' )
+
+    return render_template( 'login-setup-2fa.html', qrcode_image = image, secret = secret, confirm_url = confirm_url )
+
+# ROUTE - /login/setup-2fa-confirm
+@app.route( '/login/setup-2fa-confirm', methods=['GET', 'POST'] )
+def login_setup_2fa_confirm():
+    
+    """
+    Handles the 2FA setup confirmation form
+    """
+
+    user = flask_login.current_user
+
+    # Handle the submission of the 2FA setup confirmation form
+    if request.method == 'POST':
+
+        # Get the code digits
+        digit_1 = request.form.get( 'two_factor_code_digit_1' )
+        digit_2 = request.form.get( 'two_factor_code_digit_2' )
+        digit_3 = request.form.get( 'two_factor_code_digit_3' )
+        digit_4 = request.form.get( 'two_factor_code_digit_4' )
+        digit_5 = request.form.get( 'two_factor_code_digit_5' )
+        digit_6 = request.form.get( 'two_factor_code_digit_6' )
+
+        # Concatenate the digits to form the code
+        code = f"{digit_1}{digit_2}{digit_3}{digit_4}{digit_5}{digit_6}"
+
+        # Check the code is valid
+        if not Auth.verify_2fa_code( code, user.secret ):
+
+            flash( 'That code didn\'t work. Maybe it expired?', 'error' )
+
+            return render_template( 'login-setup-confirm-2fa.html' )
+
+        user.passed_two_factor_auth()
+
+        # Redirect to the homepage
+        return redirect( url_for( 'index' ) )
+
+    return render_template( 'login-setup-confirm-2fa.html' )
+
 # ROUTE - /register
 @app.route( '/register' )
 def register():
@@ -125,6 +202,7 @@ def logout():
     Simple route logs out the current user
     """
 
+    session.pop( 'two_factor_auth', None )
     flask_login.logout_user()
     flash( 'You have been logged out', 'success' )
 
