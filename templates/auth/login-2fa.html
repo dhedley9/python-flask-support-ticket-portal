@@ -31,3 +31,7 @@
 <input type="submit" name="submit" id="login_submit" class="button button-primary" value="Next">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 {% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='/js/login-two-factor.js') }}"></script>
+{% endblock %}
