@@ -70,7 +70,7 @@
                     {% endfor %}
                 </div>
 
-                <form class="ticket-update" method="post" action="{{ url_for( 'handler_update_ticket' ) }}">
+                <form class="ticket-update" method="post" action="{{ url_for( 'portal.handler_update_ticket' ) }}">
                     <h3>Update Ticket</h3>
                     <textarea placeholder="Ticket comments" name="comment"></textarea>
 
