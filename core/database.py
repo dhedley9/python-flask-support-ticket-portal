@@ -51,6 +51,7 @@ class Database():
             role TEXT NOT NULL,
             date_created DATETIME NOT NULL,
             secret VARCHAR(32),
+            two_factor_enabled INTEGER DEFAULT 0,
             last_login DATETIME
         ); """
 

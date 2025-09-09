@@ -35,20 +35,23 @@ class User:
 
     def __init__( self, args ) :
 
-        self.id               = args['ID']
-        self.email            = args['email']
-        self.password         = args['password']
-        self.salt             = args['salt']
-        self.role             = args['role']
-        self.date_created     = args['date_created']
-        self.secret           = args['secret']
-        self.last_login       = args['last_login']
-        self.is_authenticated = True
-        self.is_active        = True
-        self.is_anonymous     = False
+        self.id                 = args['ID']
+        self.email              = args['email']
+        self.password           = args['password']
+        self.salt               = args['salt']
+        self.role               = args['role']
+        self.date_created       = args['date_created']
+        self.secret             = args['secret']
+        self.last_login         = args['last_login']
+        self.is_authenticated   = True
+        self.is_active          = True
+        self.is_anonymous       = False
 
         if( session.get('two_factor_auth') ):
             self.two_factor_auth = True
+
+        if( int( args['two_factor_enabled'] ) == 1 ):
+            self.two_factor_enabled = True
 
     def get_id( self ):
 
