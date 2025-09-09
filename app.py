@@ -3,6 +3,8 @@ import bleach
 
 from flask import Flask, request, redirect, url_for, g
 from flask_wtf.csrf import CSRFProtect
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 import core.config as config
 config.abspath = __file__
@@ -26,6 +28,13 @@ Init().run()
 
 app            = Flask( __name__ )
 app.secret_key = config.secret_key
+
+app.config['SQLALCHEMY_DATABASE_URI']        = config.db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Intialise Flask Migration
+db      = SQLAlchemy( app )
+migrate = Migrate( app, db )
 
 # Login manager compatability
 login_manager  = flask_login.LoginManager()
