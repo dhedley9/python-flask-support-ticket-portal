@@ -5,7 +5,13 @@
     </a>
 
     <div class="portal-header-page-title">{{ header_title }}</div>
-
+    
+    <div class="portal-header-actions">
+        {% if header_actions %}
+            {{ header_actions | safe }}
+        {% endif %}
+    </div>
+    
     <a class="portal-header-user" href="{{ url_for( 'portal.account' ) }}">
         <div class="portal-header-user-icon"><i class="fa-solid fa-user"></i></div>
         <div class="portal-header-user-content">

@@ -314,13 +314,12 @@ body.sidebar-menu-closed .portal-wrap{
 
 .portal{
     width: 100%;
-    padding: 30px;
+    padding: 0;
     font-weight: 400;
     overflow: hidden;
-    background: #fff;
-    border: 1px solid #d2d3d5;
+    background: #ffffff;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.19);
-    border-radius: 15px;
+    border-radius: 0;
     height: auto;
     max-height: 100%;
     overflow: auto;
@@ -344,13 +343,20 @@ body.sidebar-menu-closed .portal-wrap{
     border-radius: 0 !important;
     height: 38px;
     margin-right: 31px;
-    width: auto;
+    width: 125px;
 }
 
 .portal-header .portal-header-page-title{
     color: white;
     font-weight: bold;
     font-size: 16px;
+    min-width: 150px;
+}
+
+.portal-header .portal-header-actions .button{
+    border-color: white;
+    color: white;
+    padding: 6px 13px;
 }
 
 .portal-header .portal-header-user{
@@ -492,8 +498,15 @@ body.sidebar-menu-closed .sidebar-menu button {
 
 .portal table.portal-tickets{
     width: 100%;
-    margin-top: 40px;
     font-size: 14px;
+    border: solid 1px #d2d3d5;
+}
+
+.portal table.portal-tickets,
+.portal table.portal-tickets tr,
+.portal table.portal-tickets th,
+.portal table.portal-tickets td{
+    border-collapse: collapse;
 }
 
 .portal table.portal-tickets thead th{
@@ -501,11 +514,20 @@ body.sidebar-menu-closed .sidebar-menu button {
     font-weight: normal;
 }
 
-.portal table.portal-tickets thead th,
-.portal table.portal-tickets tbody td{
-    border-top: solid 1px #EDEDED;
-    border-bottom: solid 1px #EDEDED;
+.portal table.portal-tickets thead th{
+    border-top: solid 1px #d2d3d5;
+    border-bottom: solid 1px #d2d3d5;
     padding: 10px;
+}
+
+.portal table.portal-tickets tbody td{
+    border-top: solid 1px #d2d3d5;
+    border-bottom: solid 1px #d2d3d5;
+    padding: 15px 10px;
+}
+
+.portal table.portal-tickets tbody tr:nth-child(odd){
+    background: #f7f6f6;
 }
 
 /* Ticket Singular */
@@ -553,6 +575,11 @@ body.sidebar-menu-closed .sidebar-menu button {
 .portal .ticket-comments .ticket-comment .ticket-comment__top .ticket-comment__time{
     font-size: 10px;
     margin-left: 5px;
+}
+
+.portal .portal-form-wrap{
+    padding: 40px;
+    border: solid 1px #d2d3d5;
 }
 
 .portal .ticket-update h3{

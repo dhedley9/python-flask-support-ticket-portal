@@ -4,17 +4,19 @@
 {% set header_title = "New Ticket" %}
 
 {% block portal_content %}
-<form class="ticket-update" method="post" action="{{ url_for( 'portal.handler_create_ticket' ) }}">
+<div class="portal-form-wrap">
+    <form class="ticket-update" method="post" action="{{ url_for( 'portal.handler_create_ticket' ) }}">
 
-    <input type="text" placeholder="Subject" name="subject">
+        <input type="text" placeholder="Subject" name="subject">
 
 
-    <textarea placeholder="Ticket comments" name="comment"></textarea>
+        <textarea placeholder="Ticket comments" name="comment"></textarea>
 
-    <div class="ticket-update__actions">
-        <button type="submit" name="action" class="button button-primary" value="update" onclick="return confirm('Are you sure you want create a new ticket?')">Create Ticket</button>
-    </div>
+        <div class="ticket-update__actions">
+            <button type="submit" name="action" class="button button-primary" value="update" onclick="return confirm('Are you sure you want create a new ticket?')">Create Ticket</button>
+        </div>
 
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-</form>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    </form>
+</div>
 {% endblock %}
