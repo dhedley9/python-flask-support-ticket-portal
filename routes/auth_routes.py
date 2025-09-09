@@ -1,4 +1,5 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, session
+from datetime import datetime
 
 import flask_login
 import bleach
@@ -6,6 +7,7 @@ import bleach
 from core.users import Users
 from core.auth import Auth
 from core.failed_logins import Failed_Logins
+from core.mailer import Mailer
 
 import core.config as config
 
@@ -190,6 +192,76 @@ def login_2fa():
         return redirect( url_for( 'portal.index' ) )
 
     return render_template( 'auth/login-2fa.html' )
+
+# ROUTE - /verify_email
+@auth_bp.route( '/verify_email' )
+def verify_email():
+
+    """
+    Simple route which outputs the email verification form
+    """
+
+    user = flask_login.current_user
+
+    verify_token = request.args.get( 'token' )
+    verify_id    = request.args.get( 'id' )
+    resend       = request.args.get( 'resend' )
+
+    if( resend == '1' ):
+        send_email = True
+    else:
+        send_email = False
+        
+    # Handle the verification link being clicked
+    if( verify_token != None and verify_id != None ):
+
+        # The user being verified may not be the currently logged in user
+        verify_user = Users.get_user_by( 'ID', verify_id )
+
+        # Check the verification token is valid
+        if( verify_user and verify_user.email_verification_code == verify_token ):
+
+            # Update the user's email verification status
+            Users.update_user( verify_user.id, { 'email_verified': 1 } )
+
+            # If the user is the currently logged in user, redirect to the homepage
+            if( user.is_anonymous == False and user.id == verify_user.id ):
+                user.email_verified = True
+
+                flash( 'Email verified', 'success' )
+
+                return redirect( url_for( 'portal.index' ) )
+            # Otherwise, return a message
+            else:
+                return 'Email verified'
+        else:
+            return 'Invalid verification token'
+
+    # If the user doesn't have a verification code, generate one
+    if( user.email_verification_code == None ):
+
+        token = Auth.generate_url_safe_token( 32 )
+
+        user.email_verification_code = token
+
+        Users.update_user( user.id, { 'email_verification_code': token } )
+
+        send_email = True
+
+    # Send the email if required
+    if( send_email ):
+
+        email_html = render_template( 'emails/signup.html', token = user.email_verification_code, user_id = user.get_id(), env = config.environment )
+
+        date = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+
+        user.signup_email_sent = date
+
+        Users.update_user( user.id, { 'signup_email_sent': date } )
+
+        Mailer.send_email( user.email, 'Verify your email address', email_html )
+
+    return render_template( 'auth/verify-email.html' )
 
 # ROUTE - /post/create_account  
 @auth_bp.route( '/post/create_account', methods=['POST'] )

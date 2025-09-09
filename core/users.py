@@ -68,7 +68,7 @@ class Users():
         """
         
         # Only allow certain fields to be updated
-        allowed = ['email', 'password', 'role', 'last_login', 'secret', 'two_factor_enabled']
+        allowed = ['email', 'password', 'role', 'last_login', 'secret', 'email_verified', 'email_verification_code', 'signup_email_sent', 'two_factor_enabled']
         clean   = {}
         where   = { 'ID': ID }
 
@@ -119,7 +119,7 @@ class Users():
             field = 'ID'
 
         # Prepared query
-        sql = 'SELECT ID, email, password, salt, role, date_created, secret, two_factor_enabled, last_login FROM users WHERE ' + field + ' = ?'
+        sql = 'SELECT ID, email, password, salt, role, date_created, secret, email_verified, email_verification_code, signup_email_sent, two_factor_enabled, last_login FROM users WHERE ' + field + ' = ?'
 
         value  = [value]
         value  = tuple( value )
@@ -139,8 +139,11 @@ class Users():
             'role': result[4],
             'date_created': datetime.strptime( result[5], '%Y-%m-%d %H:%M:%S' ),
             'secret': result[6],
-            'two_factor_enabled': result[7],
-            'last_login': result[8],
+            'email_verified': result[7],
+            'email_verification_code': result[8],
+            'signup_email_sent': result[9],
+            'two_factor_enabled': result[10],
+            'last_login': result[11],
         }
 
         if userdata['last_login'] != None:
