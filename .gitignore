@@ -48,5 +48,8 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Ignore virtual environment
+env/
+
 launch.json
 database.db
