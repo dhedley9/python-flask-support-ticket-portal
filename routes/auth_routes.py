@@ -95,6 +95,7 @@ def register():
 
 # ROUTE - /login/setup-2fa
 @auth_bp.route( '/login/setup-2fa', methods=['GET', 'POST'] )
+@flask_login.login_required
 def login_setup_2fa():
 
     """
@@ -116,6 +117,7 @@ def login_setup_2fa():
 
 # ROUTE - /login/setup-2fa-confirm
 @auth_bp.route( '/login/setup-2fa-confirm', methods=['GET', 'POST'] )
+@flask_login.login_required
 def login_setup_2fa_confirm():
     
     """
@@ -156,6 +158,7 @@ def login_setup_2fa_confirm():
 
 # ROUTE - /login/2fa
 @auth_bp.route( '/login/2fa', methods=['GET', 'POST'] )
+@flask_login.login_required
 def login_2fa():
     
     """
@@ -237,6 +240,9 @@ def verify_email():
                 return 'Email verified'
         else:
             return 'Invalid verification token'
+    
+    if( not user or user.is_anonymous ):
+        return redirect( url_for( 'auth.login' ) )
 
     # If the user doesn't have a verification code, generate one
     if( user.email_verification_code == None ):
