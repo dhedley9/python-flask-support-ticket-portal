@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>New Ticket</title>
+        <title>New User</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
     </head>
     <body>
@@ -45,7 +45,7 @@
                     </div>
 
                     <div class="ticket-update__actions">
-                        <button type="submit" name="action" class="button button-primary" value="update" onclick="return confirm('Are you sure you want create a new ticket?')">Create Ticket</button>
+                        <button type="submit" name="action" class="button button-primary" value="update" onclick="return confirm('Are you sure you want create a new user?')">Create User</button>
                     </div>
 
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
