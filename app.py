@@ -97,7 +97,11 @@ def login():
         
         flash( 'Invalid Email Address or Password', 'error' )
         
-        logger.info(f"User '{user.id}' FAILED login from IP address {client_ip}.")
+        if( user ) :
+            logger.info(f"User '{user.id}' FAILED login from IP address {client_ip}. Reason: Invalid password")
+        else:
+            logger.info(f"User '0' FAILED login from IP address {client_ip}. Reason: Invalid email. Email {email}")
+        
         
         return render_template( 'login.html', email = email )
 
@@ -306,7 +310,7 @@ def handler_update_ticket():
         return 'Invalid ticket ID'
     
     # Check the user can edit the ticket
-    if user.role != 'administrator' and ticket.created_by != user.id:
+    if user.role != 'administrator' and ticket['created_by'] != user.id:
         return 'You cannot edit this ticket'
     
     # Only admins can delete tickets
@@ -344,6 +348,8 @@ def handler_update_ticket():
         # If a normal user commented - mark as 'processing'
         else:
             Tickets.update_ticket( ticket['ID'], { 'status': 'processing' } )
+
+        flash( 'Ticket updated', 'success' )
 
         # Redirect to the ticket page
         return redirect( url_for( 'ticket', id=ticket['ID'] ) )
@@ -535,6 +541,8 @@ def handler_new_user():
         flash( 'An error occurred creating the user', 'error' )
         return redirect( url_for( 'new_user' ) )
     
+    flash( 'User account created', 'success' )
+    
     # Redirect to the edit page for the new user
     return redirect( url_for( 'user', id=user_id ) )
 
@@ -596,12 +604,12 @@ def handler_edit_user():
     # Check the email address is valid
     if( email != clean_email or not Users.validate_email( clean_email ) ):
         flash( 'Email address is invalid or contained invalid characters', 'error' )
-        return redirect( url_for( 'new_user' ) )
+        return redirect( url_for( 'user', id=user_id ) )
     
     # Check the role is valid
     if( role != 'standard' and role != 'administrator' ):
         flash( 'Invalid role', 'error' )
-        return redirect( url_for( 'new_user' ) )
+        return redirect( url_for( 'user', id=user_id ) )
     
     update = {}
 
