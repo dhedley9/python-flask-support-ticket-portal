@@ -3,8 +3,12 @@ import qrcode
 import base64
 import secrets
 import string
+import re
+
+import core.config as config
 
 from io import BytesIO
+from pathlib import Path
 
 class Auth:
 
@@ -50,3 +54,43 @@ class Auth:
         characters = string.ascii_letters + string.digits + "-_"
 
         return ''.join( secrets.choice( characters ) for i in range( length ) )
+    
+    def is_password_strong( password ):
+
+        # Define regular expressions for password validation
+        has_uppercase = any( char.isupper() for char in password )
+        has_lowercase = any( char.islower() for char in password )
+        has_number    = any( char.isdigit() for char in password )
+        has_special   = any( char in '!@#$%^&*(),.?":{}|<>' for char in password )
+        has_length    = len( password ) >= 8
+
+        # Check if the password meets all the criteria
+        if not ( has_uppercase and has_lowercase and has_number and has_special and has_length ):
+            return 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number and one special character.'
+        
+        if Auth.is_password_common( password ):
+            return 'Password is too common.'
+        
+        return True
+        
+    def is_password_common( password ):
+
+        password_lower    = password.lower()
+        password_stripped = re.sub( r'[!@#$%^&*(),.?":{}|<>0-9]', '', password_lower )
+        blacklist         = Auth.get_password_blacklist()
+
+        print( password_lower, password_stripped )
+
+        if password_lower in blacklist or password_stripped in blacklist:
+            return True
+        
+        return False
+
+    def get_password_blacklist():
+            
+        path = Path( config.abspath ).parent.absolute()
+
+        file  = path / 'static/resources/owasp-common-passwords.txt'
+
+        with open( file, "r" ) as f:
+            return set( line.strip().lower() for line in f )
