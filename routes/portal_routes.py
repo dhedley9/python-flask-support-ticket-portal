@@ -7,6 +7,7 @@ import core.config as config
 from core.users import Users
 from core.tickets import Tickets
 from core.comments import Comments
+from core.failed_logins import Failed_Logins
 
 portal_bp = Blueprint( 'portal', __name__ )
 
@@ -141,6 +142,27 @@ def user( id ):
     user = Users.get_user_by( 'ID', id )
 
     return render_template( 'portal/user.html', user = user )
+
+# ROUTE - /failed_logins
+@portal_bp.route( '/failed_logins' )
+@flask_login.login_required
+def failed_logins():
+
+    """
+    Returns the page for all failed login attempts
+    - Login required
+    """
+
+    # Only admins can see failed logins
+    if( not flask_login.current_user.is_admin() ):
+        flash( 'You\'re not allowed to do that!', 'error' )
+        return redirect( url_for( 'portal.index' ) )
+
+    failed_logins = Failed_Logins.get_failed_logins()
+
+    print( failed_logins )
+
+    return render_template( 'portal/failed_logins.html', failed_logins = failed_logins )
 
 # ROUTE - /post/create_ticket
 @portal_bp.route( '/post/create_ticket', methods=['POST'] )
