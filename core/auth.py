@@ -61,7 +61,7 @@ class Auth:
         has_uppercase = any( char.isupper() for char in password )
         has_lowercase = any( char.islower() for char in password )
         has_number    = any( char.isdigit() for char in password )
-        has_special   = any( char in '!@#$%^&*(),.?":{}|<>' for char in password )
+        has_special   = re.search( r'[^a-zA-Z0-9]', password)
         has_length    = len( password ) >= 8
 
         # Check if the password meets all the criteria
