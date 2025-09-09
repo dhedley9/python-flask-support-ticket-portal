@@ -43,14 +43,15 @@ def login():
         user     = Users.get_user_by( 'email', email )
 
         # If there is a user and the (hashed) password match, log the user in
-        if user and user.password == Users.hash_password( password, user.salt, config.pepper ):
+        if user and Users.check_password( user, password ):
+
             flask_login.login_user( user )
 
             # Record and log the login
-            Users.track_login( user.id )
+            Users.track_login( user.ID )
             Failed_Logins.clear_failed_logins( client_ip )
 
-            logger.info(f"User '{user.id}' logged in from IP address {client_ip}.")
+            logger.info(f"User '{user.ID}' logged in from IP address {client_ip}.")
 
             # Redirect to the homepage
             return redirect( url_for( 'portal.index' ) )
@@ -58,7 +59,7 @@ def login():
         flash( 'Invalid Email Address or Password', 'error' )
         
         if( user ) :
-            logger.info(f"User '{user.id}' FAILED login from IP address {client_ip}. Reason: Invalid password")
+            logger.info(f"User '{user.ID}' FAILED login from IP address {client_ip}. Reason: Invalid password")
         else:
             logger.info(f"User '0' FAILED login from IP address {client_ip}. Reason: Invalid email. Email {email}")
         
@@ -94,6 +95,7 @@ def register():
 
 # ROUTE - /login/setup-2fa
 @auth_bp.route( '/login/setup-2fa', methods=['GET', 'POST'] )
+@flask_login.login_required
 def login_setup_2fa():
 
     """
@@ -107,7 +109,7 @@ def login_setup_2fa():
     qr     = Auth.get_qr_code( uri )
     image  = Auth.get_qr_code_img( qr )
 
-    Users.update_user( user.id, { 'secret': secret } )
+    Users.update_user( user.ID, { 'secret': secret } )
 
     confirm_url = url_for( 'auth.login_setup_2fa_confirm' )
 
@@ -115,6 +117,7 @@ def login_setup_2fa():
 
 # ROUTE - /login/setup-2fa-confirm
 @auth_bp.route( '/login/setup-2fa-confirm', methods=['GET', 'POST'] )
+@flask_login.login_required
 def login_setup_2fa_confirm():
     
     """
@@ -146,7 +149,7 @@ def login_setup_2fa_confirm():
 
         user.passed_two_factor_auth()
 
-        Users.update_user( user.id, { 'two_factor_enabled': 1 } )
+        Users.update_user( user.ID, { 'two_factor_enabled': 1 } )
 
         # Redirect to the homepage
         return redirect( url_for( 'portal.index' ) )
@@ -155,6 +158,7 @@ def login_setup_2fa_confirm():
 
 # ROUTE - /login/2fa
 @auth_bp.route( '/login/2fa', methods=['GET', 'POST'] )
+@flask_login.login_required
 def login_2fa():
     
     """
@@ -186,7 +190,7 @@ def login_2fa():
 
         user.passed_two_factor_auth()
 
-        Users.update_user( user.id, { 'two_factor_enabled': 1 } )
+        Users.update_user( user.ID, { 'two_factor_enabled': 1 } )
 
         # Redirect to the homepage
         return redirect( url_for( 'portal.index' ) )
@@ -222,10 +226,10 @@ def verify_email():
         if( verify_user and verify_user.email_verification_code == verify_token ):
 
             # Update the user's email verification status
-            Users.update_user( verify_user.id, { 'email_verified': 1 } )
+            Users.update_user( verify_user.ID, { 'email_verified': 1 } )
 
             # If the user is the currently logged in user, redirect to the homepage
-            if( user.is_anonymous == False and user.id == verify_user.id ):
+            if( user.is_anonymous == False and user.ID == verify_user.ID ):
                 user.email_verified = True
 
                 flash( 'Email verified', 'success' )
@@ -236,6 +240,9 @@ def verify_email():
                 return 'Email verified'
         else:
             return 'Invalid verification token'
+    
+    if( not user or user.is_anonymous ):
+        return redirect( url_for( 'auth.login' ) )
 
     # If the user doesn't have a verification code, generate one
     if( user.email_verification_code == None ):
@@ -244,7 +251,7 @@ def verify_email():
 
         user.email_verification_code = token
 
-        Users.update_user( user.id, { 'email_verification_code': token } )
+        Users.update_user( user.ID, { 'email_verification_code': token } )
 
         send_email = True
 
@@ -253,11 +260,11 @@ def verify_email():
 
         email_html = render_template( 'emails/signup.html', token = user.email_verification_code, user_id = user.get_id(), env = config.environment )
 
-        date = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+        date = datetime.today()
 
         user.signup_email_sent = date
 
-        Users.update_user( user.id, { 'signup_email_sent': date } )
+        Users.update_user( user.ID, { 'signup_email_sent': date } )
 
         Mailer.send_email( user.email, 'Verify your email address', email_html )
 

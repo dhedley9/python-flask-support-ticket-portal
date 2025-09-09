@@ -1,4 +1,5 @@
-from core.database import Database
+from core.database import database
+from models.ticket import Ticket
 from datetime import datetime
 
 class Tickets():
@@ -19,7 +20,7 @@ class Tickets():
         :return int
         """
 
-        date = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+        date = datetime.today()
 
         data = {
             'title': title,
@@ -29,9 +30,11 @@ class Tickets():
             'last_updated': date,
         }
         
-        ticket_id = Database.insert( 'tickets', data )
+        ticket = Ticket( data )
 
-        return ticket_id
+        database.add_model( ticket )
+
+        return ticket.ID
 
     def update_ticket( ID, args ):
 
@@ -44,28 +47,23 @@ class Tickets():
         :return boolean
         """
 
+        ticket = Tickets.get_ticket( ID )
+
         # List of fields that can be updated
         allowed = ['title', 'status', 'created_by']
-        clean   = {}
-        where   = { 'ID': ID }
+        updated = False
 
-        # Loop through and only include allowed fields
         for key in args:
             
             if key in allowed:
-                clean[key] = args[key]
+                setattr( ticket, key, args[key] )
+                updated = True
 
-        # Make sure there are some updates to do
-        if len( clean ) == 0:
-            return False
-        
-        # Track this update's datetime
-        clean['last_updated'] = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+        if updated:
+            ticket.last_updated = datetime.today()
+            return True
 
-        # Update the record
-        Database.update( 'tickets', clean, where )
-
-        return True
+        return False
     
     def delete_ticket( ID ):
 
@@ -77,9 +75,12 @@ class Tickets():
         :return True
         """
 
-        where = { 'ID': ID }
+        ticket = Tickets.get_ticket( ID )
 
-        Database.delete( 'tickets', where )
+        if ticket == False:
+            return False
+        
+        database.delete_model( ticket )
 
         return True
 
@@ -93,8 +94,7 @@ class Tickets():
         :return List
         """
 
-        sql    = 'SELECT ID, title, status, created_by, date_created, last_updated FROM tickets WHERE 1=1'
-        values = []
+        filters = {}
 
         # If filtering
         if( len( args ) > 0 ):
@@ -107,93 +107,18 @@ class Tickets():
 
                 if( key in allowed ):
 
-                    value = args[key]
+                    filters[key] = args[key]
 
-                    sql += ' AND ' + key + ' = ?'
-                    values.append( value )
-
-        # Do the query
-        values  = tuple( values )
-        results = Database.get_results( sql, values )
-        tickets = []
-
-        # Organise results into standardised dictionaries
-        for row in results:
-
-            ticket = {
-                'ID': row[0],
-                'title': row[1],
-                'status': row[2],
-                'created_by': row[3],
-                'date_created': datetime.strptime( row[4], '%Y-%m-%d %H:%M:%S' ),
-                'last_updated': row[5],
-                'number': '#{:06d}'.format( row[0] ),
-                'status_label': Tickets.get_status_label( row[2] )
-            }
-
-            if ticket['last_updated'] != None:
-                ticket['last_updated'] = datetime.strptime( ticket['last_updated'], '%Y-%m-%d %H:%M:%S' )
-
-            tickets.append( ticket )
-
-        return tickets
+        return database.get_models( Ticket, filters )
     
-    def get_ticket( id ) :
+    def get_ticket( ID ) :
 
         """
         Retrieve a single ticket
 
-        :param id - (int) the ticket ID
+        :param ID - (int) the ticket ID
 
         :return dictionary OR False
-        """ 
-
-        sql = 'SELECT ID, title, status, created_by, date_created, last_updated FROM tickets WHERE ID = ?'
-
-        id  = int( id )
-        id  = [id]
-        id  = tuple( id )
-        
-        result = Database.get_row( sql, id )
-
-        # Check there is a result
-        if( result == None ) :
-            return False
-        
-        # Organise the database row into a dictionary
-        ticket = {
-            'ID': result[0],
-            'title': result[1],
-            'status': result[2],
-            'created_by': result[3],
-            'date_created': datetime.strptime( result[4], '%Y-%m-%d %H:%M:%S' ),
-            'last_updated': result[5],
-            'number': '#{:06d}'.format( result[0] ),
-            'status_label': Tickets.get_status_label( result[2] )
-        }
-
-        if ticket['last_updated'] != None:
-            ticket['last_updated'] = datetime.strptime( ticket['last_updated'], '%Y-%m-%d %H:%M:%S' )
-
-        return ticket
-    
-    def get_status_label( status ):
-
-        """
-        Get a status label from a status name
-
-        :param status - (string) the status
-
-        :return string
         """
 
-        statuses = {
-            'active': 'Awaiting Staff Reply',
-            'pending': 'Awaiting Client Reply',
-            'complete': 'Resolved'
-        }
-
-        if status in statuses:
-            return statuses[status]
-        
-        return status
+        return database.get_model( Ticket, { 'ID': ID } )

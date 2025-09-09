@@ -17,7 +17,7 @@ class User:
         is_active (bool): Whether the user is active
         is_anonymous (bool): Whether the user is anonymous (not saved to DB)
     """
-
+    ID                      = None
     id                      = None
     email                   = None 
     password                = None
@@ -38,6 +38,7 @@ class User:
 
     def __init__( self, args ) :
         
+        self.ID                      = args['ID']
         self.id                      = args['ID']
         self.email                   = args['email']
         self.password                = args['password']

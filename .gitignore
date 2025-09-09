@@ -52,5 +52,6 @@ Thumbs.db
 env/
 
 launch.json
+tasks.json
 database.db
 .env
