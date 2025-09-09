@@ -95,12 +95,13 @@ class Users():
         :return True
         """
 
-        user = Users.get_user_by( 'ID', ID )
+        # user = Users.get_user_by( 'ID', ID )
+        user_model = database.get_model( User_Model, { 'ID': ID } )
 
-        if user == False:
+        if user_model == None:
             return False
         
-        database.delete_model( user )
+        database.delete_model( user_model )
 
         return True
     
