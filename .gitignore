@@ -53,3 +53,4 @@ env/
 
 launch.json
 database.db
+.env
