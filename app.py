@@ -5,6 +5,7 @@ from flask import Flask, request, redirect, url_for, g
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_talisman import Talisman
 
 import core.config as config
 config.abspath = __file__
@@ -45,6 +46,18 @@ login_manager.init_app( app )
 
 # CSRF protection compatability
 csrf = CSRFProtect( app )
+
+# Define a CSP policy to allow Font Awesome
+csp = {
+    'default-src': ["'self'"],
+    'script-src': ["'self'"],  # Scripts
+    'style-src': ["'self'", 'https://cdnjs.cloudflare.com'],  # Styles
+    'font-src': ["'self'", 'https://cdnjs.cloudflare.com'],   # Fonts
+    'img-src': ["'self'"],  # Images
+}
+
+# Add Talisman for security headers
+Talisman( app, content_security_policy=csp )
 
 # Loading the currently logged in user
 @login_manager.user_loader
