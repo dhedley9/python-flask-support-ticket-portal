@@ -24,7 +24,7 @@
             <tr>
                 <td>{{ ticket.get_number() }}</td>
                 <td>{{ ticket.title }}</td>
-                <td>{{ ticket.last_updated }}</td>
+                <td>{{ ticket.get_last_updated() }}</td>
                 <td>{{ ticket.get_status_label() }}</td>
                 <td><a href="{{ url_for( 'portal.ticket', id=ticket.ID ) }}">View Ticket</td>
             </tr>
