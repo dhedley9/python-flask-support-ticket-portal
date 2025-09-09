@@ -1,0 +1,16 @@
+<header class="portal-header">
+
+    <a class="portal-header-logo" href="{{ url_for( 'portal.index' ) }}">
+        <img loading="lazy" src="{{ url_for('static', filename='/images/ca-logo-white.png') }}" alt="Creative Asset Logo">
+    </a>
+
+    <div class="portal-header-page-title">{{ header_title }}</div>
+
+    <a class="portal-header-user" href="{{ url_for( 'portal.account' ) }}">
+        <div class="portal-header-user-icon"><i class="fa-solid fa-user"></i></div>
+        <div class="portal-header-user-content">
+            <div class="portal-header-user-email">{{ current_user.email }}</div>
+            <div class="portal-header-user-role">{{ current_user.role | capitalize }}</div>
+        </div>
+    </a>
+</header>

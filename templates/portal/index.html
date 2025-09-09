@@ -1,54 +1,33 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>My Tickets</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
-    </head>
-    <body>
+{% extends "portal/portal_base.html" %}
 
-        <div class="portal-wrap">
+{% block title %}My Tickets{% endblock %}
+{% set header_title = "My Tickets" %}
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="notice notice-{{ category }}">
-                            {{ message | safe }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+{% block portal_content %}
 
-            <div class="portal">
+<a href="{{ url_for( 'portal.new_ticket' ) }}" class="button">Add Ticket</a>
 
-                {% with page_title="Support Tickets", page="index" %}
-                    {% include "template-parts/header.html" %}
-                {% endwith %}
-                
-                <a href="{{ url_for( 'portal.new_ticket' ) }}" class="button">Add Ticket</a>
+<table class="portal-tickets">
+    <thead>
+        <tr>
+            <th>Ticket ID</th>
+            <th>Title</th>
+            <th>Last Update</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.number }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>{{ ticket.last_updated }}</td>
+                <td>{{ ticket.status_label }}</td>
+                <td><a href="{{ url_for( 'portal.ticket', id=ticket.ID ) }}">View Ticket</td>
+            </tr>
+        {% endfor %}
+    </thead>
+</table>
 
-                <table class="portal-tickets">
-                    <thead>
-                        <tr>
-                            <th>Ticket ID</th>
-                            <th>Title</th>
-                            <th>Last Update</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ticket in tickets %}
-                            <tr>
-                                <td>{{ ticket.number }}</td>
-                                <td>{{ ticket.title }}</td>
-                                <td>{{ ticket.last_updated }}</td>
-                                <td>{{ ticket.status_label }}</td>
-                                <td><a href="{{ url_for( 'portal.ticket', id=ticket.ID ) }}">View Ticket</td>
-                            </tr>
-                        {% endfor %}
-                    </thead>
-                </table>
-            </div>
-        </div>
-    </body>
-</html>
+{% endblock %}

@@ -1,0 +1,20 @@
+<nav class="sidebar-menu">
+    <a href="{{ url_for( 'portal.index' ) }}" class="sidebar-menu-link tickets">
+        <span class="sidebar-menu-link_icon"><i class="fa-solid fa-ticket"></i></span>
+        <span class="sidebar-menu-link_name">My Tickets</span>
+    </a>
+
+    {% if current_user.is_admin() %}
+        <a href="{{ url_for( 'portal.users' ) }}" class="sidebar-menu-link users">
+            <span class="sidebar-menu-link_icon"><i class="fa-solid fa-users"></i></span>
+            <span class="sidebar-menu-link_name">Users</span>
+        </a>
+    {% endif %}
+
+    <a href="{{ url_for( 'auth.logout' ) }}" class="sidebar-menu-link logout" onclick="return confirm( 'Are you sure you want to logout?' );">
+        <span class="sidebar-menu-link_icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+        <span class="sidebar-menu-link_name">Logout</span>
+    </a>
+    
+    <button class="sidebar-menu-toggle-btn"><i class="fa-solid fa-chevron-left"></i></button>
+</nav>
