@@ -1,270 +1,162 @@
-import sqlite3
-
-from sqlite3 import Error
-from pathlib import Path
-
 import core.config as config
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from flask import g, has_request_context
 
 class Database():
 
-    """
-    Class for handling all database interactions
-    """
+    url           = None
+    engine        = None
 
-    def __get_connection():
+    def __init__( self ):
 
-        """
-        INTERNAL - Open a connection to the database
+        self.url    = config.db_url
+        self.engine = create_engine( self.url )
 
-        :return Connection object
-        """
-
-        file = config.abspath
-
-        path = Path( file ).parent.absolute()
-
-        sql_path = path / 'sql'
-        db_path  = path / 'sql/database.db'
-
-        if not sql_path.exists():
-            sql_path.mkdir()
-
-        conn = None
-
-        try:
-            conn = sqlite3.connect( db_path )
-            return conn
-        except Error as e:
-            print(e)
-
-    def create_default_tables() :
+    def create_tables( self, Base ):
 
         """
         Create the database tables
         """
 
-        sql = """ CREATE TABLE IF NOT EXISTS users (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT NOT NULL,
-            password TEXT NOT NULL,
-            salt TEXT NOT NULL,
-            role TEXT NOT NULL,
-            date_created DATETIME NOT NULL,
-            secret VARCHAR(32),
-            email_verified INTEGER DEFAULT 0,
-            email_verification_code VARCHAR(32),
-            signup_email_sent DATETIME,
-            two_factor_enabled INTEGER DEFAULT 0,
-            last_login DATETIME
-        ); """
+        Base.metadata.create_all( self.engine )
 
-        Database.query( sql )
-
-        sql = """ CREATE TABLE IF NOT EXISTS tickets (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            status TEXT NOT NULL,
-            created_by INTEGER NOT NULL,
-            date_created DATETIME NOT NULL,
-            last_updated DATETIME NOT NULL,
-            FOREIGN KEY (created_by) REFERENCES users(ID)
-        ); """
-
-        Database.query( sql )
-
-        sql = """ CREATE TABLE IF NOT EXISTS comments (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            ticket_id INTEGER NOT NULL,
-            user_id INTEGER NOT NULL,
-            content LONGTEXT NOT NULL,
-            date_created DATETIME NOT NULL,
-            FOREIGN KEY (ticket_id) REFERENCES tickets(ID),
-            FOREIGN KEY (user_id) REFERENCES users(ID)
-        ); """
-
-        Database.query( sql )
-
-        sql = """ CREATE TABLE IF NOT EXISTS failed_logins (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            ip_address TEXT NOT NULL,
-            attempts INTEGER DEFAULT 0,
-            last_attempt DATETIME
-        ); """
-
-        Database.query( sql )
-
-    def query( sql ):
+    def get_session( self ):
 
         """
-        Perform a database query
-
-        :param sql - (string) the SQL query
+        Get a new session
         """
 
-        connection = Database.__get_connection()
-        cursor     = connection.cursor()
+        if has_request_context():
 
-        cursor.execute( sql )
-        connection.close()
+            if hasattr( g, 'db_session' ):
+                return g.db_session
+            else:
+                g.db_session = sessionmaker( bind = self.engine )()
+                return g.db_session
+        
+        if( config.init_use_db_session is True ):
+            
+            if config.init_db_session:
+                return config.init_db_session
+            else:
+                config.init_db_session = sessionmaker( bind = self.engine )()
+                return config.init_db_session
+        
+        return sessionmaker( bind = self.engine )()
     
-    def insert( table, data ):
+    def commit( self, session ):
 
         """
-        Standardised method to insert some data into a database table, in a prepared query
-
-        :param table - (string) the table name
-        :param data - (dictionary) the data to insert, where key is the column
-
-        :return int
+        Commit the changes to the session
         """
 
-        # Get the column names
-        columns = data.keys()
-        columns = list( columns )
-        columns = "', '".join( columns )
+        if has_request_context():
+            session.commit()
+        elif config.init_use_db_session is True:
+            session.flush()
+        else:
+            session.commit()
+            session.close()
 
-        # Get the values to insert
-        values  = data.values()
-        values  = tuple( values )
+    def close_session( self ):
 
-        # Generate a string of placeholders for the prepared query
-        placeholders = ['?'] * len( values )
-        placeholders = ", ".join( placeholders )
+        """
+        Close the session
+        """
 
-        # Create the query with placeholders
-        sql  = "INSERT INTO " + table
-        sql += " ('" + columns + "')"
-        sql += " VALUES (" + placeholders + ")"
+        if( has_request_context() and hasattr( g, 'db_session' ) == True ):
 
-        connection = Database.__get_connection()
-        cursor     = connection.cursor()
+            g.db_session.commit()
+            g.db_session.close()
+            delattr( g, 'db_session' )
 
-        # Do the prepared query
-        cursor.execute( sql, values )
+        if( config.init_use_db_session is True ):
 
-        connection.commit()
-        connection.close()
-
-        # Return the inserted ID
-        return cursor.lastrowid
+            if( config.init_db_session != None ):
+                config.init_db_session.commit()
+                config.init_db_session.close()
+                config.init_db_session = None
     
-    def update( table, data, where ):
+    def get_model( self, model, filters = {} ):
 
         """
-        Standardised method to update some data in a database table, in a prepared query
-
-        :param table - (string) the table name
-        :param data - (dictionary) the new data to update the table with, where key is the column
-        :param where - (dictionary) the criteria to match records with, where key is the column
-
-        :return True
+        Get a model from the database
         """
 
-        columns    = []
-        conditions = []
-        values     = []
+        clean_filters = {}
 
-        for key in data:
-            columns.append( key + ' = ?' )
-            values.append( data[key] )
+        for key in filters:
 
-        for key in where:
-            conditions.append( key + ' = ?' )
-            values.append( where[key] )
+            value = filters[key]
 
-        columns    = ", ".join( columns )
-        conditions = " AND ".join( conditions )
+            if( value != None ):
+                clean_filters[key] = filters[key]
 
-        # Assemble the query
-        sql    = "UPDATE " + table + " SET " + columns + " WHERE " + conditions
-        values = tuple( values )
-
-        connection = Database.__get_connection()
-        cursor     = connection.cursor()
-
-        # Do the prepared query
-        cursor.execute( sql, values )
-        connection.commit()
-        connection.close()
-       
-        return True
-    
-    def delete( table, where ):
-
-        """
-        Standardised method to delete some from a database table, in a prepared query
-
-        :param table - (string) the table name
-        :param where - (dictionary) the criteria to match records with, where key is the colum
-
-        :return True
-        """
-
-        conditions = []
-        values     = []
-
-        for key in where:
-            conditions.append( key + ' = ?' )
-            values.append( where[key] )
-
-        conditions = " AND ".join( conditions )
-
-        sql    = "DELETE FROM " + table + " WHERE " + conditions
-        values = tuple( values )
-
-        connection = Database.__get_connection()
-        cursor     = connection.cursor()
-
-        cursor.execute( sql, values )
-        connection.commit()
-        connection.close()
-       
-        return True
-
-    def get_row( sql, value = () ): 
-
-        """
-        Standardised method to retrieve a single row from the database
-
-        :param sql - (string) the sql query
-        :param value - (tuple) optional values for prepared queries
-
-        :return list
-        """
-
-        connection = Database.__get_connection()
-        cursor     = connection.cursor()
-        result     = cursor.execute( sql, value ).fetchone()
+        
+        session = self.get_session()
+        
+        if( len( clean_filters ) == 0 ):
+            result = session.query( model ).first()
+        else:
+            result = session.query( model ).filter_by( **clean_filters ).first()
+        
+        self.commit( session )
 
         return result
     
-    def get_results( sql, value = () ): 
-
+    def get_models( self, model, filters = {} ):
+            
         """
-        Standardised method to retrieve a multiple rows from the database
-
-        :param sql - (string) the sql query
-        :param value - (tuple) optional values for prepared queries
-
-        :return list
+        Get a list of models from the database
         """
 
-        connection = Database.__get_connection()
-        cursor     = connection.cursor()
-        results    = cursor.execute( sql, value ).fetchall()
+        session = self.get_session()
 
-        return results
+        if( len( filters ) == 0 ):
+            result = session.query( model ).all()
+        else:
+            result = session.query( model ).filter_by( **filters ).all()
+        
+        self.commit( session )
+
+        return result
+
+    def add_model( self, model ):
+
+        """
+        Add a new model to the database
+        """
+
+        session = self.get_session()
+
+        session.add( model )
+
+        self.commit( session )
+
+    def update_model( self, model, args ):
+            
+        """
+        Update a model in the database
+        """
+
+        session = self.get_session()
+
+        for key in args:
+            setattr( model, key, args[key] )
+
+        self.commit( session )
     
-    def get_var( sql, value = () ):
-
+    def delete_model( self, model ):
+            
         """
-        Standardised method to retrieve a single value from the database
-
-        :param sql - (string) the sql query
-        :param value - (tuple) optional values for prepared queries
-
-        :return string
+        Delete a model from the database
         """
 
-        result = Database.get_row( sql, value )
-        return result[0]
+        session = self.get_session()
+
+        session.delete( model )
+
+        self.commit( session )
+
+database = Database()

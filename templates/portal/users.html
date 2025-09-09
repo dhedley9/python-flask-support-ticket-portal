@@ -26,8 +26,8 @@
                 <td>{{ user.ID }}</td>
                 <td>{{ user.email }} {% if user.ID == current_user.id %}<b>(me)</b>{% endif %}</td>
                 <td>{{ user.role }}</td>
-                <td>{{ user.date_created }}</td>
-                <td>{{ user.last_login }}</td>
+                <td>{{ user.get_date_created() }}</td>
+                <td>{{ user.get_last_login() }}</td>
                 <td>
                     {% if user.ID == current_user.id %}
                         <a href="{{ url_for( 'portal.account' ) }}">Edit User</a>
