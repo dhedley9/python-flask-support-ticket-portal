@@ -48,6 +48,22 @@ def handle_needs_login():
                         
     return redirect( url_for( 'auth.login' ) ) 
 
+# Middleware for production environment
+if config.environment == "production":
+
+    # Enforce HTTPS on all requests
+    @app.before_request
+    def enforce_https():
+        if not request.is_secure:
+            url = request.url.replace( "http://", "https://", 1 )
+            return redirect( url, code=301 )
+    
+    # Redirect the alias to the main domain
+    @app.before_request
+    def redirect_alias():
+        if request.host == "qa-software-engineering-devops-d38aa33c0701.herokuapp.com":
+            return redirect( "https://assignment.davidhedley.com" + request.path, code=301 )
+
 @app.before_request
 def enforce_two_factor():
 
