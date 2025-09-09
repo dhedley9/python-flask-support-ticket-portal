@@ -75,15 +75,19 @@ class Users():
         
         # Only allow certain fields to be updated
         allowed = ['email', 'password', 'role', 'last_login', 'secret', 'email_verified', 'email_verification_code', 'signup_email_sent', 'two_factor_enabled']
-        updated = False
+        clean   = {}
 
         for key in args:
             
             if key in allowed:
-                setattr( user_model, key, args[key] )
-                updated = True
+                clean[key] = args[key]
+        
+        if len( clean ) == 0:
+            return False
+        
+        database.update_model( user_model, clean )
 
-        return updated
+        return True
     
     def delete_user( ID ):
 
