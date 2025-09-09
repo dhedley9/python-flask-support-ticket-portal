@@ -1,20 +1,18 @@
 import core.config as config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from flask import g, has_request_context
+
 
 class Database():
 
     url           = None
     engine        = None
-    session_maker = None
-    session       = None
 
     def __init__( self ):
 
-        self.url           = 'sqlite:///sql/database.db'
-        self.engine        = create_engine( self.url )
-        self.session_maker = sessionmaker( bind=self.engine )
-        pass
+        self.url    = 'sqlite:///sql/database.db'
+        self.engine = create_engine( self.url )
 
     def create_tables( self, Base ):
 
@@ -24,21 +22,43 @@ class Database():
 
         Base.metadata.create_all( self.engine )
 
-    def create_session( self ):
+    def get_session( self ):
 
         """
-        Create a new session
+        Get a new session
         """
 
-        self.session = self.session_maker()
+        if( has_request_context() == True ):
+            
+            if( hasattr( g, 'db_session' ) != False ):
+                
+                return {
+                    'session': g.db_session,
+                    'is_anonymous': False
+                }
 
-    def close_session( self ):
+        session_maker = sessionmaker( bind = self.engine )
+        session       = session_maker()
+        is_anonymous  = True
+
+        if( has_request_context() == True ):
+            g.db_session = session
+            is_anonymous = False
+
+        return {
+            'session': session,
+            'is_anonymous': is_anonymous
+        }
+
+    def close_request( self ):
 
         """
         Close the session
         """
 
-        self.session.close()
+        if( hasattr( g, 'db_session' ) == True ):
+            g.db_session.close()
+            delattr( g, 'db_session' )
     
     def get_model( self, model, filters = {} ):
 
@@ -46,7 +66,28 @@ class Database():
         Get a model from the database
         """
 
-        return self.session.query( model ).filter_by( **filters ).first()
+        clean_filters = {}
+
+        for key in filters:
+
+            value = filters[key]
+
+            if( value != None ):
+                clean_filters[key] = filters[key]
+
+        
+        session_data = self.get_session()
+        session      = session_data['session']
+        
+        if( len( clean_filters ) == 0 ):
+            result = session.query( model ).first()
+        else:
+            result = session.query( model ).filter_by( **clean_filters ).first()
+        
+        if( session_data['is_anonymous'] == True ):
+            session.close()
+
+        return result
     
     def get_models( self, model, filters = {} ):
             
@@ -54,7 +95,18 @@ class Database():
         Get a list of models from the database
         """
 
-        return self.session.query( model ).filter_by( **filters ).all()
+        session_data = self.get_session()
+        session      = session_data['session']
+
+        if( len( filters ) == 0 ):
+            result = session.query( model ).all()
+        else:
+            result = session.query( model ).filter_by( **filters ).all()
+        
+        if( session_data['is_anonymous'] == True ):
+            session.close()
+
+        return result
 
     def add_model( self, model ):
 
@@ -62,8 +114,15 @@ class Database():
         Add a new model to the database
         """
 
-        self.session.add( model )
-        self.commit()
+        session_data = self.get_session()
+        session      = session_data['session']
+
+        session.add( model )
+
+        if( session_data['is_anonymous'] == True ):
+            session.commit()
+            session.close()
+
     
     def delete_model( self, model ):
             
@@ -71,15 +130,13 @@ class Database():
         Delete a model from the database
         """
 
-        self.session.delete( model )
-        self.commit()
-    
-    def commit( self ):
+        session_data = self.get_session()
+        session      = session_data['session']
 
-        """
-        Commit the session
-        """
+        session.delete( model )
 
-        self.session.commit()
+        if( session_data['is_anonymous'] == True ):
+            session.commit()
+            session.close()
 
 database = Database()

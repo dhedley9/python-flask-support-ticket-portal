@@ -28,8 +28,6 @@ class Failed_Logins():
             
             record.attempts     = record.attempts + 1
             record.last_attempt = date
-
-            database.commit()
     
     def is_ip_locked( ip_address ):
 

@@ -1,8 +1,9 @@
 from flask import session
+from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from .base import Base
 
-class User( Base ):
+class User( UserMixin, Base ):
 
     __tablename__ = 'users'
 
@@ -19,48 +20,7 @@ class User( Base ):
     email_verified          = Column( Boolean, default=False )
     two_factor_enabled      = Column( Boolean, default=False )
 
-    is_authenticated        = True
-    is_active               = True
-    is_anonymous            = None
-
-    two_factor_auth         = False
-
     def __init__( self, args = None ):
         
         for key in args:
             setattr( self, key, args[key] )
-        
-        self.is_authenticated        = True
-        self.is_active               = True
-        self.is_anonymous            = False
-
-        self.has_passed_two_factor_auth()
-
-    def get_id( self ):
-
-        return str( self.ID )
-    
-    def is_admin( self ):
-
-        if( self.role == 'administrator' or self.role == 'superadministrator' ):
-            return True
-        
-        return False
-    
-    def passed_two_factor_auth( self ):
-
-        session['two_factor_auth'] = True
-        self.two_factor_auth       = True
-
-        return self.two_factor_auth
-    
-    def has_passed_two_factor_auth( self ):
-
-        if( self.two_factor_auth == None ):
-            
-            if( session.get('two_factor_auth') ):
-                self.two_factor_auth = True
-            else:
-                self.two_factor_auth = False
-
-        return self.two_factor_auth
