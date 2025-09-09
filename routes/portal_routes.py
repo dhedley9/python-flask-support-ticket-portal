@@ -2,12 +2,14 @@ from flask import Blueprint, request, redirect, url_for, render_template, flash,
 
 import flask_login
 import bleach
+import base64
 import core.config as config
 
 from core.users import Users
 from core.tickets import Tickets
 from core.comments import Comments
 from core.failed_logins import Failed_Logins
+from core.auth import Auth
 
 portal_bp = Blueprint( 'portal', __name__ )
 
@@ -313,24 +315,51 @@ def handler_update_account():
     user             = flask_login.current_user
 
     # Get the form data
-    email            = request.form.get( 'email' )
-    password         = request.form.get( 'password' )
-    new_password     = request.form.get( 'new_password' )
-    confirm_password = request.form.get( 'new_password_confirm' )
+    action            = request.form.get( 'action' )
+    email             = request.form.get( 'email' )
+    current_password  = request.form.get( 'current_password' )
+    new_password      = request.form.get( 'password' )
+    confirm_password  = request.form.get( 'password_confirm' )
 
     # Sanitise
     email            = bleach.clean( email )
-    password         = bleach.clean( password )
+    current_password = bleach.clean( current_password )
     new_password     = bleach.clean( new_password )
     confirm_password = bleach.clean( confirm_password )
 
     email  = Users.sanitize_email( email )
     update = {}
 
-    # Check the user has confirmed their password to make changes
-    if( user.password != Users.hash_password( password, user.salt, config.pepper ) ):
-        flash( 'Please confirm your current password to make changes to your account', 'error' )
-        return redirect( url_for( 'portal.account' ) )
+    # User updating their password
+    if( action == 'update_password') :
+
+        # Check the user has confirmed their password to make changes
+        if( Users.check_password( user, current_password ) == False ):
+            flash( 'Please confirm your current password to make changes to your account', 'error' )
+            return redirect( url_for( 'portal.account' ) )
+        
+        # Check is has been confirmed
+        if not confirm_password:
+            flash( 'You must confirm your new password', 'error' )
+            return redirect( url_for( 'portal.account' ) )
+        
+         # Check the two passwords match
+        if new_password != confirm_password:
+            flash( 'New passwords did not match', 'error' )
+            return redirect( url_for( 'portal.account' ) )
+        
+        is_strong = Auth.is_password_strong( new_password )
+
+        if is_strong != True:
+            flash( is_strong, 'error' )
+            return redirect( url_for( 'portal.account' ) )
+        
+        # Salt + Hash the password
+        salt = base64.b64decode( user.salt )
+        hash = Users.hash_password( new_password, salt, config.pepper )
+
+        # Redirect with a success message
+        flash( 'Your password has been updated', 'success' )
     
     # Check the user has entered a valid new email address
     if( not Users.validate_email( email ) ) :
@@ -350,32 +379,7 @@ def handler_update_account():
         # Add it to the dictionary to update
         update['email'] = email
 
-    # If a new password has been set
-    if( new_password ):
 
-        # Check is has been confirmed
-        if not confirm_password:
-            flash( 'You must confirm your new password', 'error' )
-            return redirect( url_for( 'portal.account' ) )
-        
-        # Check the two passwords match
-        if new_password != confirm_password:
-            flash( 'New passwords did not match', 'error' )
-            return redirect( url_for( 'portal.account' ) )
-        
-        # Salt + Hash the password
-        hash = Users.hash_password( new_password, user.salt, config.pepper )
-
-        # If it's different, add it to the dictionary
-        if hash != user.password:
-            update['password'] = hash
-
-    # If there are fields to update, perform an update
-    if len( update ) > 0:
-        Users.update_user( user.ID, update )
-
-    # Redirect with a success message
-    flash( 'User account updated', 'success' )
     
     return redirect( url_for( 'portal.account' ) )
 
