@@ -36,6 +36,14 @@ class Database():
                 g.db_session = sessionmaker( bind = self.engine )()
                 return g.db_session
         
+        if( config.init_use_db_session is True ):
+            
+            if config.init_db_session:
+                return config.init_db_session
+            else:
+                config.init_db_session = sessionmaker( bind = self.engine )()
+                return config.init_db_session
+        
         return sessionmaker( bind = self.engine )()
     
     def commit( self, session ):
@@ -45,6 +53,8 @@ class Database():
         """
 
         if has_request_context():
+            session.flush()
+        elif config.init_use_db_session is True:
             session.flush()
         else:
             session.commit()
@@ -56,11 +66,18 @@ class Database():
         Close the session
         """
 
-        if( hasattr( g, 'db_session' ) == True ):
+        if( has_request_context() and hasattr( g, 'db_session' ) == True ):
 
             g.db_session.commit()
             g.db_session.close()
             delattr( g, 'db_session' )
+
+        if( config.init_use_db_session is True ):
+
+            if( config.init_db_session != None ):
+                config.init_db_session.commit()
+                config.init_db_session.close()
+                config.init_db_session = None
     
     def get_model( self, model, filters = {} ):
 
