@@ -101,7 +101,7 @@ class Tickets():
         if( len( args ) > 0 ):
 
             # Fields that can be filtered by
-            allowed = ['status', 'created_by']
+            allowed = ['status', 'created_by', 'client_id']
             
             # Only include allowed arguments
             for key in args:

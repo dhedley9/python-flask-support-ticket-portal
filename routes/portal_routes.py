@@ -24,7 +24,7 @@ def index():
     args = {}
 
     if( not flask_login.current_user.is_admin() ):
-        args['created_by'] = flask_login.current_user.ID
+        args['client_id'] = flask_login.current_user.ID
     
     tickets = Tickets.get_tickets( args )
     return render_template( 'portal/index.html', tickets = tickets )
