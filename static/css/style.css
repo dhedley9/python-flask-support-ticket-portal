@@ -345,7 +345,7 @@ body.sidebar-menu-closed .portal-wrap{
     border-radius: 0 !important;
     height: 38px;
     margin-right: 31px;
-    width: 125px;
+    width: auto;
 }
 
 .portal-header .portal-header-page-title{
