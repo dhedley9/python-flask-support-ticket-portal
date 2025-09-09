@@ -10,6 +10,14 @@
             <div class="ticket-info__item__label">Ticket ID</div>
             <div class="ticket-info__item__value">{{ ticket.get_number() }}</div>
         </div>
+
+        {% if current_user.is_admin() %}
+            <div class="ticket-info__item">
+                <div class="ticket-info__item__label">Customer</div>
+                <div class="ticket-info__item__value">{{ client.email }}</div>
+            </div>
+        {% endif %}
+
         <div class="ticket-info__item">
             <div class="ticket-info__item__label">Status</div>
             <div class="ticket-info__item__value">{{ ticket.get_status_label() }}</div>
@@ -27,15 +35,17 @@
     <div class="ticket-comments">
 
         {% for comment in comments %}
-            <div class="ticket-comment {% if comment.user_id == user.id and not user.is_admin() %}customer{% else %}support{% endif %}">
+            <div class="ticket-comment {% if comment.user_id == client.id %}customer{% else %}support{% endif %}">
                 
                 <div class="ticket-comment__top">
                     
                     <span class="ticket-comment__author">
-                        {% if current_user.id == user.id %}
+                        {% if comment.user_id == current_user.id %}
                             Me
-                        {% elif comment.user_id == user.id and not user.is_admin() %}
-                            Customer ({{ user.email }})
+                        {% elif current_user.is_admin() and comment.user_id == client.ID  %}
+                            Client ({{ comment.get_user().email }})                            
+                        {% elif current_user.is_admin() %}
+                            Support ({{ comment.get_user().email }})
                         {% else %}
                             Support
                         {% endif %}
