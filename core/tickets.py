@@ -1,4 +1,5 @@
 from core.database import database
+from core.comments import Comments
 from models.ticket import Ticket
 from datetime import datetime
 
@@ -8,7 +9,7 @@ class Tickets():
     Class containing useful methods for tickets
     """
 
-    def create_ticket( title, user_id, status = 'active' ):
+    def create_ticket( title, user_id, client_id, status = 'active' ):
 
         """
         Create a new ticket
@@ -26,6 +27,7 @@ class Tickets():
             'title': title,
             'status': status,
             'created_by': user_id,
+            'client_id': client_id,
             'date_created': date,
             'last_updated': date,
         }
@@ -51,19 +53,21 @@ class Tickets():
 
         # List of fields that can be updated
         allowed = ['title', 'status', 'created_by']
-        updated = False
+        clean   = {}
 
         for key in args:
             
             if key in allowed:
-                setattr( ticket, key, args[key] )
-                updated = True
+                clean[key] = args[key]
 
-        if updated:
-            ticket.last_updated = datetime.today()
-            return True
+        if len( clean ) <= 0:
+            return False
+        
+        clean['last_updated'] = datetime.today()
 
-        return False
+        database.update_model( ticket, clean )
+
+        return True
     
     def delete_ticket( ID ):
 
@@ -80,11 +84,16 @@ class Tickets():
         if ticket == False:
             return False
         
+        comments = Comments.get_comments_by_ticket_id( ID )
+
+        for comment in comments:
+            database.delete_model( comment )
+        
         database.delete_model( ticket )
 
         return True
 
-    def get_tickets( args = {} ) :
+    def get_tickets( args = {}, order = {} ):
 
         """
         Retrieve tickets based on a set of arguments
@@ -100,7 +109,7 @@ class Tickets():
         if( len( args ) > 0 ):
 
             # Fields that can be filtered by
-            allowed = ['status', 'created_by']
+            allowed = ['status', 'created_by', 'client_id']
             
             # Only include allowed arguments
             for key in args:
@@ -109,7 +118,7 @@ class Tickets():
 
                     filters[key] = args[key]
 
-        return database.get_models( Ticket, filters )
+        return database.get_models( Ticket, filters, order )
     
     def get_ticket( ID ) :
 
