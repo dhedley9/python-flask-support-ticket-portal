@@ -57,8 +57,6 @@ def enforce_two_factor():
     if( not user or user.is_anonymous ):
         return
     
-    print( endpoint )
-
     if endpoint is None or endpoint in [ 'auth.logout', 'auth.login', 'auth.login_setup_2fa', 'auth.login_setup_2fa_confirm', 'auth.login_2fa', 'static']:
         return
         
