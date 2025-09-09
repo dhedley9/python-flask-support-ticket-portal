@@ -78,7 +78,7 @@ def logout():
     flask_login.logout_user()
     flash( 'You have been logged out', 'success' )
 
-    return redirect( 'auth.login' )
+    return redirect( url_for( 'auth.login' ) )
 
 # ROUTE - /register
 @auth_bp.route( '/register' )
