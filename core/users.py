@@ -36,11 +36,12 @@ class Users():
             return False
         
         # Get today's date and a random salt string
-        date = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
-        salt = os.urandom( 32 )
+        date   = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
+        salt   = os.urandom( 32 )
+        pepper = config.pepper
 
         # Hash the password with the salt
-        hashed_password = Users.hash_password( password, salt )
+        hashed_password = Users.hash_password( password, salt, pepper )
         
         data = {
             'email': email,
@@ -182,19 +183,22 @@ class Users():
 
         return users
     
-    def hash_password( password, salt ) :
+    def hash_password( password, salt, pepper ) :
 
         """
         Salt and hash a password
 
         :param password - (string) the plaintext password
         :param salt - (string) the salt string to salt the password with
+        :param pepper - (string) the pepper string to salt the password with
 
         :return string
         """
 
+        peppered_password = password + pepper
+
         # Hash using sha235 algorithm
-        return hashlib.pbkdf2_hmac( 'sha256', password.encode( 'utf-8' ), salt, 100000 )
+        return hashlib.pbkdf2_hmac( 'sha256', peppered_password.encode( 'utf-8' ), salt, 100000 )
     
     def sanitize_email( email ): 
 
