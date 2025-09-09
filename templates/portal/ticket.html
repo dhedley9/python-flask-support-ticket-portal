@@ -1,18 +1,18 @@
 {% extends "portal/portal_base.html" %}
 
 {% block title %}Edit Ticket{% endblock %}
-{% set header_title = "Edit Ticket " ~ ticket.number ~ "" %}
+{% set header_title = "Edit Ticket " ~ ticket.get_number() ~ "" %}
 
 {% block portal_content %}
 <div class="portal-form-wrap">
     <div class="ticket-info">
         <div class="ticket-info__item">
             <div class="ticket-info__item__label">Ticket ID</div>
-            <div class="ticket-info__item__value">{{ ticket.number }}</div>
+            <div class="ticket-info__item__value">{{ ticket.get_number() }}</div>
         </div>
         <div class="ticket-info__item">
             <div class="ticket-info__item__label">Status</div>
-            <div class="ticket-info__item__value">{{ ticket.status_label }}</div>
+            <div class="ticket-info__item__value">{{ ticket.get_status_label() }}</div>
         </div>
         <div class="ticket-info__item">
             <div class="ticket-info__item__label">Date Created</div>

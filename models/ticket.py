@@ -16,3 +16,19 @@ class Ticket( Base ):
         
         for key in args:
             setattr( self, key, args[key] )
+    
+    def get_number( self ):
+        return '#{:06d}'.format( self.ID )
+    
+    def get_status_label( self ):
+
+        statuses = {
+            'active': 'Awaiting Staff Reply',
+            'pending': 'Awaiting Client Reply',
+            'complete': 'Resolved'
+        }
+
+        if self.status in statuses:
+            return statuses[self.status]
+        
+        return self.status

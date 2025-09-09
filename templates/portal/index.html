@@ -22,10 +22,10 @@
     <tbody>
         {% for ticket in tickets %}
             <tr>
-                <td>{{ ticket.number }}</td>
+                <td>{{ ticket.get_number() }}</td>
                 <td>{{ ticket.title }}</td>
                 <td>{{ ticket.last_updated }}</td>
-                <td>{{ ticket.status_label }}</td>
+                <td>{{ ticket.get_status_label() }}</td>
                 <td><a href="{{ url_for( 'portal.ticket', id=ticket.ID ) }}">View Ticket</td>
             </tr>
         {% endfor %}
