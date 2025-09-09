@@ -22,7 +22,7 @@ def login():
     client_ip = request.remote_addr
 
     if Failed_Logins.is_ip_locked( client_ip ):
-        return render_template( 'locked.html' ), 403
+        return render_template( 'auth/locked.html' ), 403
 
     # Handle the submission of the login form
     if request.method == 'POST':
@@ -62,9 +62,9 @@ def login():
         
         Failed_Logins.log_failed_login( client_ip )
 
-        return render_template( 'login.html', email = email )
+        return render_template( 'auth/login.html', email = email )
 
-    return render_template( 'login.html' )
+    return render_template( 'auth/login.html' )
 
 # ROUTE - /logout
 @auth_bp.route( '/logout' )
@@ -88,7 +88,7 @@ def register():
     Simple route which outputs the user registration form
     """
 
-    return render_template( 'register.html' )
+    return render_template( 'auth/register.html' )
 
 # ROUTE - /login/setup-2fa
 @auth_bp.route( '/login/setup-2fa', methods=['GET', 'POST'] )
@@ -109,7 +109,7 @@ def login_setup_2fa():
 
     confirm_url = url_for( 'auth.login_setup_2fa_confirm' )
 
-    return render_template( 'login-setup-2fa.html', qrcode_image = image, secret = secret, confirm_url = confirm_url )
+    return render_template( 'auth/login-setup-2fa.html', qrcode_image = image, secret = secret, confirm_url = confirm_url )
 
 # ROUTE - /login/setup-2fa-confirm
 @auth_bp.route( '/login/setup-2fa-confirm', methods=['GET', 'POST'] )
@@ -140,7 +140,7 @@ def login_setup_2fa_confirm():
 
             flash( 'That code didn\'t work. Maybe it expired?', 'error' )
 
-            return render_template( 'login-setup-confirm-2fa.html' )
+            return render_template( 'auth/login-setup-confirm-2fa.html' )
 
         user.passed_two_factor_auth()
 
@@ -149,7 +149,7 @@ def login_setup_2fa_confirm():
         # Redirect to the homepage
         return redirect( url_for( 'portal.index' ) )
 
-    return render_template( 'login-setup-confirm-2fa.html' )
+    return render_template( 'auth/login-setup-confirm-2fa.html' )
 
 # ROUTE - /login/2fa
 @auth_bp.route( '/login/2fa', methods=['GET', 'POST'] )
@@ -180,7 +180,7 @@ def login_2fa():
 
             flash( 'That code didn\'t work. Maybe it expired?', 'error' )
 
-            return render_template( 'login-setup-confirm-2fa.html' )
+            return render_template( 'auth/login-setup-confirm-2fa.html' )
 
         user.passed_two_factor_auth()
 
@@ -189,7 +189,7 @@ def login_2fa():
         # Redirect to the homepage
         return redirect( url_for( 'portal.index' ) )
 
-    return render_template( 'login-2fa.html' )
+    return render_template( 'auth/login-2fa.html' )
 
 # ROUTE - /post/create_account  
 @auth_bp.route( '/post/create_account', methods=['POST'] )
