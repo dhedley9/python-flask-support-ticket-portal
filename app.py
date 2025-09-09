@@ -1,3 +1,9 @@
+from models import User, Ticket, Comment, Failed_Login, Base
+from core.database import database
+
+database.create_tables( Base )
+database.create_session()
+
 import flask_login
 import bleach
 
@@ -9,7 +15,6 @@ config.abspath = __file__
 
 from core.database import Database
 from core.users import Users
-from core.user import User
 from core.tickets import Tickets
 from core.comments import Comments
 from core.auth import Auth
@@ -21,12 +26,9 @@ from routes.auth_routes import auth_bp
 from routes.portal_routes import portal_bp
 
 # Create the database tables and the default admin user, if they don't exist
-Database.create_default_tables()
-count = Database.get_var( 'SELECT count( ID ) FROM users WHERE role = "administrator" LIMIT 1' )
-count = int( count )
 
-if count == 0:
-    admin_id = Users.create_user( config.default_admin_email, config.default_admin_password, 'administrator' )
+if Users.admin_user_exists() == False:
+    admin_id = Users.create_user( config.default_admin_email, config.default_admin_password, 'administrator' )    
     Users.update_user( admin_id, { 'email_verified': 1 } )
 
 app            = Flask( __name__ )
