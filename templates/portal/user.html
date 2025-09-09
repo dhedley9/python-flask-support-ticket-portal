@@ -8,8 +8,23 @@
     <form class="ticket-update" method="post" action="{{ url_for( 'portal.handler_edit_user' ) }}">
 
         <div class="form-field">
-            <label for="email">Email Address:</label>
-            <input type="text" id="email" name="email" required="required" value="{{ user.email }}">
+            <label for="eamil">Email Address:</label>
+        
+            <div class="icon">
+                <i class="fa-solid fa-user"></i>
+            </div>
+        
+            <input type="text" id="email" name="email" value="{{ user.email }}" required="required" placeholder="Email Address">
+        </div>
+
+        <div class="form-field">
+            <label for="password">Change Password:</label>
+            
+            <div class="icon">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+        
+            <input type="password" id="password" name="password" spellcheck="false" placeholder="New Password">
         </div>
 
         <div class="form-field">
@@ -18,11 +33,6 @@
                 <option value="standard" {% if user.role == 'standard' %} selected="selected" {% endif %}>Standard</option>
                 <option value="administrator" {% if user.role == 'administrator' %} selected="selected" {% endif %}>Administrator</option>
             </select>
-        </div>
-
-        <div class="form-field">
-            <label for="password">Change Password:</label>
-            <input type="password" id="password" name="password" value="" placeholder="New Password">
         </div>
 
         <div class="ticket-update__actions">
