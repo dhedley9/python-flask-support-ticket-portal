@@ -256,7 +256,7 @@ def handler_update_ticket():
         return 'Invalid ticket ID'
     
     # Check the user can edit the ticket
-    if user.role != 'administrator' and ticket.created_by != user.ID:
+    if user.role != 'administrator' and ticket.client_id != user.ID:
         return 'You cannot edit this ticket'
     
     # Only admins can delete tickets
