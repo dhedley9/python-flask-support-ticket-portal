@@ -21,7 +21,7 @@ def login():
     Returns and handles the login form
     """
 
-    client_ip = request.remote_addr
+    client_ip = Auth.get_client_ip( request )
 
     if Failed_Logins.is_ip_locked( client_ip ):
         return render_template( 'auth/locked.html' ), 403

@@ -94,3 +94,15 @@ class Auth:
 
         with open( file, "r" ) as f:
             return set( line.strip().lower() for line in f )
+        
+    
+    def get_client_ip( request ):
+
+        # Heroku and most proxies append the real client IP to the X-Forwarded-For header
+        forwarded_for = request.headers.get('X-Forwarded-For')
+        
+        if forwarded_for:
+            # X-Forwarded-For is a comma-separated list of IPs, the first is the real client IP
+            return forwarded_for.split(',')[0]
+        
+        return request.remote_addr
