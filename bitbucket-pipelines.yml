@@ -6,21 +6,22 @@
 image: python:3.12.0
 
 pipelines:
-  default:
-    - step:
-        name: Build
-        script:
-          - git archive --format=tar.gz main -o qa-software-engineering-devops.tar.gz
-        artifacts:
-          - qa-software-engineering-devops.tar.gz
-    - step:
-        name: Deploy to production
-        deployment: production
-        caches:
-          - pip
-        script:
-          - pipe: atlassian/heroku-deploy:0.1.1
-            variables:
-              HEROKU_API_KEY: $HEROKU_API_KEY
-              HEROKU_APP_NAME: $HEROKU_APP_NAME
-              ZIP_FILE: qa-software-engineering-devops.tar.gz
+  branches:
+    main:
+      - step:
+          name: Build
+          script:
+            - git archive --format=tar.gz main -o qa-software-engineering-devops.tar.gz
+          artifacts:
+            - qa-software-engineering-devops.tar.gz
+      - step:
+          name: Deploy to production
+          deployment: production
+          caches:
+            - pip
+          script:
+            - pipe: atlassian/heroku-deploy:0.1.1
+              variables:
+                HEROKU_API_KEY: $HEROKU_API_KEY
+                HEROKU_APP_NAME: $HEROKU_APP_NAME
+                ZIP_FILE: qa-software-engineering-devops.tar.gz
