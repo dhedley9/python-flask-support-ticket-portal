@@ -3,7 +3,21 @@ from datetime import datetime
 
 class Tickets():
 
+    """
+    Class containing useful methods for tickets
+    """
+
     def create_ticket( title, user_id, status = 'active' ):
+
+        """
+        Create a new ticket
+
+        :param title - (string) the title of the ticket
+        :param user_id - (int) the ID of the user creating the ticket
+        :param status - (string) the status of the new ticket
+
+        :return int
+        """
 
         date = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
 
@@ -21,25 +35,47 @@ class Tickets():
 
     def update_ticket( ID, args ):
 
+        """
+        Update a ticket
+
+        :param ID - (int) the ID of the ticket to update
+        :param args - (dictionary) data to update
+
+        :return boolean
+        """
+
+        # List of fields that can be updated
         allowed = ['title', 'status', 'created_by']
         clean   = {}
         where   = { 'ID': ID }
 
+        # Loop through and only include allowed fields
         for key in args:
             
             if key in allowed:
                 clean[key] = args[key]
 
+        # Make sure there are some updates to do
         if len( clean ) == 0:
             return False
         
+        # Track this update's datetime
         clean['last_updated'] = datetime.today().strftime( '%Y-%m-%d %H:%M:%S' )
 
+        # Update the record
         Database.update( 'tickets', clean, where )
 
         return True
     
     def delete_ticket( ID ):
+
+        """
+        Delete a ticket
+
+        :param ID - (int) the ticket ID
+
+        :return True
+        """
 
         where = { 'ID': ID }
 
@@ -49,13 +85,24 @@ class Tickets():
 
     def get_tickets( args = {} ) :
 
+        """
+        Retrieve tickets based on a set of arguments
+
+        :param args - (dictionary) arguments to filter returned tickets
+
+        :return List
+        """
+
         sql    = 'SELECT ID, title, status, created_by, date_created, last_updated FROM tickets WHERE 1=1'
         values = []
 
+        # If filtering
         if( len( args ) > 0 ):
 
+            # Fields that can be filtered by
             allowed = ['status', 'created_by']
             
+            # Only include allowed arguments
             for key in args:
 
                 if( key in allowed ):
@@ -65,10 +112,12 @@ class Tickets():
                     sql += ' AND ' + key + ' = ?'
                     values.append( value )
 
+        # Do the query
         values  = tuple( values )
         results = Database.get_results( sql, values )
         tickets = []
 
+        # Organise results into standardised dictionaries
         for row in results:
 
             ticket = {
@@ -89,7 +138,15 @@ class Tickets():
 
         return tickets
     
-    def get_ticket( id ) : 
+    def get_ticket( id ) :
+
+        """
+        Retrieve a single ticket
+
+        :param id - (int) the ticket ID
+
+        :return dictionary OR False
+        """ 
 
         sql = 'SELECT ID, title, status, created_by, date_created, last_updated FROM tickets WHERE ID = ?'
 
@@ -99,9 +156,11 @@ class Tickets():
         
         result = Database.get_row( sql, id )
 
+        # Check there is a result
         if( result == None ) :
             return False
-            
+        
+        # Organise the database row into a dictionary
         ticket = {
             'ID': result[0],
             'title': result[1],
@@ -116,6 +175,14 @@ class Tickets():
         return ticket
     
     def get_status_label( status ):
+
+        """
+        Get a status label from a status name
+
+        :param status - (string) the status
+
+        :return string
+        """
 
         statuses = {
             'active': 'Awaiting Staff Reply',
