@@ -48,25 +48,27 @@ def handle_needs_login():
                         
     return redirect( url_for( 'auth.login' ) ) 
 
-# @app.before_request
-# def enforce_two_factor():
+@app.before_request
+def enforce_two_factor():
 
-    # endpoint = request.endpoint
-    # user     = flask_login.current_user
+    endpoint = request.endpoint
+    user     = flask_login.current_user
 
-    # if( not user or user.is_anonymous ):
-    #     return
-
-    # if endpoint is None or endpoint in ['login', 'login_setup_2fa', 'login_setup_2fa_confirm', 'login_2fa', 'static']:
-    #     return
-        
-    # if ( user.two_factor_auth == False and user.two_factor_enabled == False ):
-        
-    #     return redirect( url_for( 'auth.login_setup_2fa' ) )
+    if( not user or user.is_anonymous ):
+        return
     
-    # elif( user.two_factor_auth == False and user.two_factor_enabled == True ):
+    print( endpoint )
 
-    #     return redirect( url_for( 'auth.login_2fa' ) )
+    if endpoint is None or endpoint in ['auth.login', 'auth.login_setup_2fa', 'auth.login_setup_2fa_confirm', 'auth.login_2fa', 'static']:
+        return
+        
+    if ( user.two_factor_auth == False and user.two_factor_enabled == False ):
+        
+        return redirect( url_for( 'auth.login_setup_2fa' ) )
+    
+    elif( user.two_factor_auth == False and user.two_factor_enabled == True ):
+
+        return redirect( url_for( 'auth.login_2fa' ) )
 
 # Register Blueprints
 app.register_blueprint( auth_bp )
