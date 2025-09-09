@@ -8,9 +8,13 @@ class Database():
     url           = None
     engine        = None
 
-    def __init__( self ):
+    def __init__( self, db_url = None ):
 
-        self.url    = config.db_url
+        if( db_url != None ):
+            self.url = db_url
+        else:
+            self.url = config.db_url
+
         self.engine = create_engine( self.url )
 
     def create_tables( self, Base ):
