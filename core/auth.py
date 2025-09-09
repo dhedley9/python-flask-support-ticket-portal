@@ -1,6 +1,9 @@
 import pyotp
 import qrcode
 import base64
+import secrets
+import string
+
 from io import BytesIO
 
 class Auth:
@@ -41,3 +44,9 @@ class Auth:
         img_tag = f'<img src="data:image/png;base64,{img_str}" alt="QR Code">'
 
         return img_tag
+    
+    def generate_url_safe_token( length ):
+
+        characters = string.ascii_letters + string.digits + "-_"
+
+        return ''.join( secrets.choice( characters ) for i in range( length ) )
