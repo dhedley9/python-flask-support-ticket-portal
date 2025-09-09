@@ -10,7 +10,6 @@ pipelines:
     - step:
         name: Build
         script:
-          - cd sample-python-app
           - git archive --format=tar.gz main -o qa-software-engineering-devops.tar.gz
         artifacts:
           - qa-software-engineering-devops.tar.gz
