@@ -119,9 +119,9 @@ class Tickets():
         :param ID - (int) the ticket ID
 
         :return dictionary OR False
-        """ 
+        """
 
-        return database.get_model( Ticket, { ID: ID } )
+        return database.get_model( Ticket, { 'ID': ID } )
     
     def get_status_label( status ):
 
