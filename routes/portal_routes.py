@@ -191,8 +191,6 @@ def handler_create_ticket():
     if( user.is_admin() ):
         client_id = request.form.get( 'client_id' )
 
-        print( 'client_id', client_id )
-
         try:
             client_id = int( client_id )
         except:
