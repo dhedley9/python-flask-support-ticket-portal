@@ -309,18 +309,6 @@ def handler_create_account():
         flash( is_strong, 'error' )
         return redirect( url_for( 'auth.register' ) )
     
-    # Define regular expressions for password validation
-    has_uppercase = any( char.isupper() for char in clean_password )
-    has_lowercase = any( char.islower() for char in clean_password )
-    has_number    = any( char.isdigit() for char in clean_password )
-    has_special   = any( char in '!@#$%^&*(),.?":{}|<>' for char in clean_password )
-    has_length    = len( clean_password ) >= 8
-
-    # Check if the password meets all the criteria
-    if not ( has_uppercase and has_lowercase and has_number and has_special and has_length ):
-        flash('Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number and one special character.', 'error')
-        return redirect( url_for( 'auth.register' ) )
-    
     user = Users.get_user_by( 'email', email )
 
     # Check the email address hasn't already been used
