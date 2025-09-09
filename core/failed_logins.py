@@ -25,9 +25,13 @@ class Failed_Logins():
             database.add_model( record )
         
         else:
-            
-            record.attempts     = record.attempts + 1
-            record.last_attempt = date
+
+            args = {
+                'attempts': record.attempts +1,
+                'last_attempt': date
+            }
+
+            database.update_model( record, args )
     
     def is_ip_locked( ip_address ):
 
