@@ -28,29 +28,29 @@ class Database():
         Get a new session
         """
 
-        if( has_request_context() == True ):
-            
-            if( hasattr( g, 'db_session' ) != False ):
-                
-                return {
-                    'session': g.db_session,
-                    'is_anonymous': False
-                }
+        if has_request_context():
 
-        session_maker = sessionmaker( bind = self.engine )
-        session       = session_maker()
-        is_anonymous  = True
+            if hasattr( g, 'db_session' ):
+                return g.db_session
+            else:
+                g.db_session = sessionmaker( bind = self.engine )()
+                return g.db_session
+        
+        return sessionmaker( bind = self.engine )()
+    
+    def commit( self, session ):
 
-        if( has_request_context() == True ):
-            g.db_session = session
-            is_anonymous = False
+        """
+        Commit the changes to the session
+        """
 
-        return {
-            'session': session,
-            'is_anonymous': is_anonymous
-        }
+        if has_request_context():
+            session.flush()
+        else:
+            session.commit()
+            session.close()
 
-    def close_request( self ):
+    def close_session( self ):
 
         """
         Close the session
@@ -78,16 +78,14 @@ class Database():
                 clean_filters[key] = filters[key]
 
         
-        session_data = self.get_session()
-        session      = session_data['session']
+        session = self.get_session()
         
         if( len( clean_filters ) == 0 ):
             result = session.query( model ).first()
         else:
             result = session.query( model ).filter_by( **clean_filters ).first()
         
-        if( session_data['is_anonymous'] == True ):
-            session.close()
+        self.commit( session )
 
         return result
     
@@ -97,16 +95,14 @@ class Database():
         Get a list of models from the database
         """
 
-        session_data = self.get_session()
-        session      = session_data['session']
+        session = self.get_session()
 
         if( len( filters ) == 0 ):
             result = session.query( model ).all()
         else:
             result = session.query( model ).filter_by( **filters ).all()
         
-        if( session_data['is_anonymous'] == True ):
-            session.close()
+        self.commit( session )
 
         return result
 
@@ -116,16 +112,11 @@ class Database():
         Add a new model to the database
         """
 
-        session_data = self.get_session()
-        session      = session_data['session']
+        session = self.get_session()
 
         session.add( model )
 
-        if( session_data['is_anonymous'] == True ):
-            session.commit()
-            session.close()
-        else:
-            session.flush()
+        self.commit( session )
 
     
     def delete_model( self, model ):
@@ -134,15 +125,10 @@ class Database():
         Delete a model from the database
         """
 
-        session_data = self.get_session()
-        session      = session_data['session']
+        session = self.get_session()
 
         session.delete( model )
 
-        if( session_data['is_anonymous'] == True ):
-            session.commit()
-            session.close()
-        else:    
-            session.flush()
+        self.commit( session )
 
 database = Database()
