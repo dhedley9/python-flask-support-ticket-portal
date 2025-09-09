@@ -1,0 +1,36 @@
+{% extends "auth/auth_base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block body_class %}page-auth-login{% endblock %}
+
+{% block auth_form_content %}
+<h2>Log in to your account</h2>
+
+<div class="form-field">
+    <label for="login_email">Email Address:</label>
+
+    <div class="icon">
+        <i class="fa-solid fa-user"></i>
+    </div>
+    
+    <input type="text" id="login_email" name="email" required="required" value="{{email}}" placeholder="Email address">
+</div>
+
+<div class="form-field">
+    <label for="login_password">Password:</label>
+
+    <div class="icon">
+        <i class="fa-solid fa-lock"></i>
+    </div>
+
+    <input type="password" id="login_password" name="password" spellcheck="false" required="required" placeholder="Password">
+</div>
+
+<input type="submit" name="submit" id="login_submit" class="button button-primary" value="Log In">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+{% endblock %}
+
+{% block auth_form_footer %}
+<p class="register-message">Don't have an account? <a href="{{ url_for( 'auth.register' ) }}">Register now</a></p>
+{% endblock %}

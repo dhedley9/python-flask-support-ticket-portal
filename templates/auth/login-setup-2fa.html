@@ -1,0 +1,22 @@
+{% extends "auth/auth_base.html" %}
+
+{% block title %}Setup Two Factor Authentication{% endblock %}
+
+{% block body_class %}page-auth-login-two-factor-setup{% endblock %}
+
+{% block auth_form_content %}
+<h2>Secure your account with Two Factor Authentication</h2>
+
+<div class="qr-code">
+    <div>Scan the QR code below with your authenticator app:</div>
+
+    {{qrcode_image | safe}}
+</div>
+
+<div class="secret">
+    <div>Or enter the secret key below:</div>
+    <input type="text" name="secret" id="secret" value="{{secret}}" readonly>
+</div>
+
+<a href="{{ confirm_url }}" id="login_submit" class="button button-primary">Next</a>
+{% endblock %}

@@ -24,7 +24,7 @@
                     {% include "template-parts/header.html" %}
                 {% endwith %}
 
-                <form class="ticket-update" method="post" action="{{ url_for( 'handler_create_ticket' ) }}">
+                <form class="ticket-update" method="post" action="{{ url_for( 'portal.handler_create_ticket' ) }}">
 
                     <input type="text" placeholder="Subject" name="subject">
 

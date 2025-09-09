@@ -183,6 +183,8 @@ textarea::placeholder {
     font-size: 19px;
     cursor: pointer;
     margin-top: 5px;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .login .register-message{
@@ -192,47 +194,13 @@ textarea::placeholder {
     text-align: center;
 }
 
-/* 2fa Setup Page */
+/* Two Factor Code */
 
-.two-factor-setup h2{
-    margin-bottom: 20px;
-}
-
-.two-factor-setup .qr-code{
-    text-align: center;;
-}
-
-.two-factor-setup .qr-code div{
-    text-align: left;
-}
-
-.two-factor-setup .qr-code img{
-    max-width: 100%;
-    width: 215px;
-}
-
-.two-factor-setup .secret{
-    margin-bottom: 20px;
-}
-
-.two-factor-setup .secret input{
-    width: 100%;
-    margin-top: 5px;
-    font-size: 15px;
-    padding: 5px;
-}
-
-/* 2fa Confirm Page */
-
-.two-factor-confirm h2{
-    margin-bottom: 20px;
-}
-
-.two-factor-confirm .two-factor-code-wrap .two-factor-code-label{
+.two-factor-code-wrap .two-factor-code-label{
     text-align: center;
 }
 
-.two-factor-confirm .two-factor-code-wrap .two-factor-code{
+.two-factor-code-wrap .two-factor-code{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -240,13 +208,13 @@ textarea::placeholder {
     margin-bottom: 30px;
 }
 
-.two-factor-confirm .two-factor-code-wrap .two-factor-code .two-factor-code-separator{
+.two-factor-code-wrap .two-factor-code .two-factor-code-separator{
     font-size: 34px;
     margin-left: 5px;
     margin-right: 10px;
 }
 
-.two-factor-confirm .two-factor-code-wrap .two-factor-code .two-factor-code-digits input{
+.two-factor-code-wrap .two-factor-code .two-factor-code-digits input{
     width: 30px;
     font-size: 25px;
     padding: 5px;
@@ -254,12 +222,77 @@ textarea::placeholder {
     text-align: center;
 }
 
+/* Two Factor Setup Page */
+
+body.page-auth-login-two-factor-setup #login-form h2{
+    margin-bottom: 20px;
+}
+
+body.page-auth-login-two-factor-setup #login-form .qr-code{
+    text-align: center;;
+}
+
+body.page-auth-login-two-factor-setup #login-form .qr-code div{
+    text-align: left;
+}
+
+body.page-auth-login-two-factor-setup #login-form .qr-code img{
+    max-width: 100%;
+    width: 215px;
+}
+
+body.page-auth-login-two-factor-setup #login-form .secret{
+    margin-bottom: 20px;
+}
+
+body.page-auth-login-two-factor-setup #login-form .secret input{
+    width: 100%;
+    margin-top: 5px;
+    font-size: 15px;
+    padding: 5px;
+}
+
+/* Two Factor Setup Confirm Page */
+
+body.page-auth-login-two-factor-setup-confirm #login-form h2{
+    margin-bottom: 20px;
+}
+
+/* Two Factor Page */
+
+body.page-auth-login-two-factor #login-form h2{
+    margin-bottom: 20px;
+}
+
 /* Locked Out Page */
 
-.locked-out .lock-icon{
+body.page-auth-access-locked #login-form .lock-icon{
     text-align: center;
     margin-bottom: 30px;
     font-size: 50px;
+}
+
+/* Register Page */
+
+.password-strength{
+    margin-bottom: 20px;
+}
+
+.password-strength .password-strength-criteria .password-strength-criteria-icon .fa-xmark{
+    color: #c90000;
+}
+
+.password-strength .password-strength-criteria .password-strength-criteria-icon .fa-check{
+    color: #00c900;
+    display: none;
+}
+
+.password-strength .password-strength-criteria.passed .password-strength-criteria-icon .fa-xmark{
+    display: none;
+}
+
+.password-strength .password-strength-criteria.passed .password-strength-criteria-icon .fa-check{
+    display: inline;
 }
 
 /*--------------------------------------------------------------
