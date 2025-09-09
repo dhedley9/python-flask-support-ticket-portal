@@ -1,18 +1,16 @@
-# QA Software Engineering & DevOps Assignment - David Hedley
+# Python / Flask Secure Support Ticket Portal
 
 ## Table of Contents
-- [Overview](#markdown-header-overview)
-- [Features](#markdown-header-features)
-- [Installation](#markdown-header-installation)
-- [Additional Resources](#markdown-header-additional-resources)
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Additional Resources](#additional-resources)
 
 ## Overview
 
-The **Creative Asset Support Ticket System** is an internal tool developed to streamline client support and issue resolution for **Creative Asset**. This system allows clients to log in securely, submit support tickets and monitor the status of their requests. 
+This **Support Ticket System** is an internal tool developed to streamline client support and issue resolution. This system allows clients to log in securely, submit support tickets and monitor the status of their requests. 
 
-On the staff side, **Creative Asset** team members can view, manage and respond to all submitted tickets, aiding communication with clients.
-
-This project was developed as part of my QA Apprenticeship for the Software Engineering & DevOps module to address a real-world business need by delivering a secure complex web application.
+Users with the "administrator" role can view, manage and respond to all submitted tickets. They can also view and manage client user accounts and view failed login attempts
 
 ## Features
 
@@ -31,7 +29,7 @@ This project was developed as part of my QA Apprenticeship for the Software Engi
 
 1. **Clone the repository**:
    ```bash
-   git clone https://bitbucket.org/David-Hedley/assignment-software-engineering-devops.git
+   git clone git@github.com:dhedley9/python-flask-support-ticket-portal.git
    ```
 
 2. **Navigate to the project directory**:
@@ -41,7 +39,7 @@ This project was developed as part of my QA Apprenticeship for the Software Engi
 
 3. **Create a virtual environment** (recommended):
     ```bash
-    python3 -m venv venv
+    python3 -m venv venv       # On Windows, use `python -m venv venv`
     source venv/bin/activate   # On Windows, use `venv\Scripts\activate`
     ```
 
@@ -81,7 +79,7 @@ This project was developed as part of my QA Apprenticeship for the Software Engi
 
 8. **Replace Mailgun credentials**:
 
-    The application uses Mailgun to provide email sending functionality. The app uses the Mailgun API to add this functionality and requires the following environment variables to be configured. For more information on how to setup Mailgun, see the [Additional Resources](#markdown-header-additional-resources)
+    The application uses Mailgun to provide email sending functionality. The app uses the Mailgun API to add this functionality and requires the following environment variables to be configured. For more information on how to setup Mailgun, see the [Additional Resources](#additional-resources)
 
     - MAILGUN_API_KEY - the Mailgun API key created for the application
     - MAILGUN_DOMAIN - the sending domain used for Mailgun (Mailgun recommends this to be a subdomain, e.g. mailgun.example.com)
