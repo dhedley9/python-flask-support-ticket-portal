@@ -56,8 +56,9 @@ csp = {
     'img-src': ["'self'"],  # Images
 }
 
-# Add Talisman for security headers
-Talisman( app, content_security_policy=csp )
+if( config.environment != "testing" ):
+    # Add Talisman for security headers
+    Talisman( app, content_security_policy=csp, force_https=False )
 
 # Loading the currently logged in user
 @login_manager.user_loader

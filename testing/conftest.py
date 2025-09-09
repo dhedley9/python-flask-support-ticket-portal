@@ -2,13 +2,16 @@ import pytest
 import sys
 import os
 
+from core import config
+
+config.environment = 'testing'
+
 # Add the parent directory to the path so the application can be imported
 sys.path.insert( 0, os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..' ) ) )
 
 from app import app as app
 from app import database as database
 
-from core import config
 from core.users import Users
 
 @pytest.fixture
