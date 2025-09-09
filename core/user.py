@@ -1,5 +1,21 @@
 class User:
 
+    """
+    Represents a portal user
+
+    Attributes:
+        id (int): The user's unique ID
+        email (str): The user's email address
+        password (str): The user's salted + hashed password
+        salt (str): The salt string used to salt the user's password
+        role (str): The user's role
+        date_created (datetime): The date the user was created
+        last_login (datetime): The date the user last logged in
+        is_authenticated (bool): Whether the user is authenticated
+        is_active (bool): Whether the user is active
+        is_anonymous (bool): Whether the user is anonymous (not saved to DB)
+    """
+
     id               = None
     email            = None 
     password         = None
