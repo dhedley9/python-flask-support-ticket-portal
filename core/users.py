@@ -2,6 +2,7 @@ import hashlib
 import os
 import re
 import logging
+import base64
 
 import core.config as config
 
@@ -47,8 +48,8 @@ class Users():
         
         data = {
             'email': email,
-            'password': hashed_password,
-            'salt': salt,
+            'password': base64.b64encode( hashed_password ).decode( 'utf-8' ),
+            'salt': base64.b64encode( salt ).decode( 'utf-8' ), # Convert to base64 for storage
             'role': role,
             'date_created': date,
         }
@@ -278,3 +279,21 @@ class Users():
         admin = database.get_model( User_Model, { 'role': 'administrator' } )
 
         return admin != None
+    
+    def check_password( user, check_password ):
+
+        """
+        Check a password against a user's password
+
+        :param user - (User) the user object
+        :param check_password - (string) the password to check
+
+        :return boolean
+        """
+
+        salt = base64.b64decode( user.salt )
+
+        hashed_password = Users.hash_password( check_password, salt, config.pepper )
+        hashed_password = base64.b64encode( hashed_password ).decode( 'utf-8' )
+
+        return user.password == hashed_password
