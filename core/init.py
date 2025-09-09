@@ -34,13 +34,13 @@ class Init:
 
             Users.update_user( admin_id, { 'email_verified': 1 } )
 
-    def create_default_tickets( self, user_id ):
+    def create_default_tickets( self, user_id, client_id ):
 
-        ticket_id = Tickets.create_ticket( 'Homepage Not Loading Correctly on Mobile Devices', user_id )
+        ticket_id = Tickets.create_ticket( 'Homepage Not Loading Correctly on Mobile Devices', user_id, client_id )
         Comments.create_comment( ticket_id, user_id, 'The homepage is not displaying properly on mobile devices. Our clients have reported that some images and text appear misaligned, and the header menu is not responsive. Can you please check and fix the layout issues? The desktop version seems fine.' )
 
-        ticket_id = Tickets.create_ticket( 'Contact Form Submissions Not Received', user_id )
+        ticket_id = Tickets.create_ticket( 'Contact Form Submissions Not Received', user_id, client_id )
         Comments.create_comment( ticket_id, user_id, 'We’ve noticed that contact form submissions are not coming through. Some customers have mentioned submitting inquiries, but we haven’t received any emails. Could you investigate and ensure the form is connected correctly and emails are being sent without issues?' )
 
-        ticket_id = Tickets.create_ticket( 'Need to Update Website Footer with New Company Info', user_id )
+        ticket_id = Tickets.create_ticket( 'Need to Update Website Footer with New Company Info', user_id, client_id )
         Comments.create_comment( ticket_id, user_id, 'Our company address and phone number have changed, and we need to update the footer on all pages with this new information. Can you make the necessary changes and ensure it’s consistent across the site?' )
