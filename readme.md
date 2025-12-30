@@ -34,7 +34,7 @@ Users with the "administrator" role can view, manage and respond to all submitte
 
 2. **Navigate to the project directory**:
     ```bash
-    cd assignment-software-engineering-devops
+    cd python-flask-support-ticket-portal
     ```
 
 3. **Create a virtual environment** (recommended):
