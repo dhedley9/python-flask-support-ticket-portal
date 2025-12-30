@@ -50,6 +50,7 @@ Thumbs.db
 
 # Ignore virtual environment
 env/
+.venv/
 
 launch.json
 tasks.json
